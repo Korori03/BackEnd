@@ -1,0 +1,6 @@
+<files ~ "\.php$">
+	Order allow,deny
+	Deny from allow
+</files>
+
+ErrorDocument 403 
