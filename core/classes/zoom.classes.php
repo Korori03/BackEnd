@@ -158,7 +158,7 @@ class Zoom
         $token = ['iss' => $apiKey, 'exp' => time() + 60];
         $header = ['typ' => 'JWT', 'alg' => 'HS256'];
 
-        $toSign = self::urlsafeB64Encode(json_encode($header)) .  '.' .  self::urlsafeB64Encode(json_encode($token));
+        $toSign = self::urlsafeB64Encode(json::encode($header)) .  '.' .  self::urlsafeB64Encode(json::encode($token));
 
         $signature = hash_hmac('SHA256', $toSign, $apiSecret, true);
 

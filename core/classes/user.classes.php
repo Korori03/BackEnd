@@ -137,7 +137,7 @@ class User
 	public function hasUserItem(string $key): string
 	{
 		if (strlen($this->_useritem) > 0) {
-			$permission = json_decode($this->_useritem, true);
+			$permission = json::decode($this->_useritem, true);
 			return $permission[$key];
 		}
 		return '';
@@ -151,7 +151,7 @@ class User
 	public function hasUserSettings(string $key): string
 	{
 		if (strlen($this->_usersettings) > 0) {
-			$permission = json_decode($this->_usersettings, true);
+			$permission = json::decode($this->_usersettings, true);
 			return $permission[$key];
 		}
 		return '';

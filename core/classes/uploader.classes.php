@@ -24,7 +24,6 @@ class Uploader{
 					$_upload_dir		=	"/content/uploads/",
 					$_upload_temp_dir	=	"/content/uploads/temp/";
 
-
 /*
 	* Clear File if Exist
 	* @since 4.0.0

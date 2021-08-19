@@ -80,12 +80,16 @@ class Hash{
 		return substr(hash('sha256',$randomString),0,$length);
 	}
 
-
-	public static function randPass($abc,$length = 100) {
+/*
+	* Generate Random String
+	* @since 4.0.0
+	* @Param (Int Length)
+*/
+	public static function randPass(string $string,int $length = 100):string {
 
 		$str = "";
 		for ($i=0; $i<=$length; $i++) {
-			$str .= $abc[rand(0, strlen($abc)-1)];
+			$str .= $string[rand(0, strlen($string)-1)];
 		};
 		return $str;
 	}

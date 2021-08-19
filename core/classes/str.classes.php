@@ -128,7 +128,7 @@ class str{
 	* @Since 4.0.2
 	* @Param (String string,Char List)
 */
-	public static function _rtrim (mixed$str,string $charlist = " \t\n\r\0\x0B"):string {
+	public static function _rtrim (mixed $str,string $charlist = " \t\n\r\0\x0B"):string {
 		if (is_array($str)) {
 			foreach ($str as &$s) 
 				$s = rtrim($s, $charlist);
@@ -215,9 +215,9 @@ class str{
 	public static function _truncate (string $text,int $length = 1024,string  $ending = '...',bool $exact = false,bool $considerHtml = true):string {
 		$open_tags = [];
 		if ($considerHtml) {
-			if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
+			if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length)
 				return $text;
-			}
+
 			preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
 			$total_length = mb_strlen($ending);
 			$truncate     = '';
