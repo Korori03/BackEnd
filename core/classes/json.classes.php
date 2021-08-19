@@ -56,6 +56,7 @@ class Json {
 	* @Param (String JSon)
 */	
 	public static function toSTD(string $json):object {
+
 		$array = self::decode($json,true);
 		return arr::_toObject($array);
 	}

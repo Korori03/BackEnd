@@ -177,8 +177,11 @@ class User
 		$this->_isLoggedIn = false;
 		$this->_data = '';
 		$this->_permissions = '';
-		SESSION::delete($this->_sessionName);
-		Cookie::delete($this->_cookieName);
+		if(SESSION::exists($this->_sessionName))
+			SESSION::delete($this->_sessionName);
+
+		if(Cookie::exists($this->_sessionName))
+			Cookie::delete($this->_cookieName);
 	}
 
 

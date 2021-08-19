@@ -58,16 +58,19 @@ class arr
 	* @Since 4.0.0
 	* @Param (Array Object)
 */
-	public static function _toObject(mixed $array): object | array
+	public static function _toObject(mixed $array): mixed
 	{
+
 		if (is_array($array)) {
 			$object = new stdClass();
-			foreach ($array as $key => $value)
+			foreach ($array as $key => $value){
 				$object->$key = self::_toObject($value);
-
+			}
 			return $object;
-		} else
-			return [];
+		}
+
+
+		return $array;
 	}
 
 	/*
