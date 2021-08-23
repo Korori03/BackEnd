@@ -27,13 +27,14 @@ class file
 		$possible_extensions = cast::_array($possible_extensions);
 		if (strlen(pathinfo($base_filename)['extension']) == 0) {
 			foreach ($possible_extensions as $extension) {
+
 				$file = "$base_filename.$extension";
-				if (file_exists($_SERVER['DOCUMENT_ROOT']. $file))
+				if (file_exists($_SERVER['DOCUMENT_ROOT']. '/' .$file))
 					return true;
 			}
 		} else {
 			$file = $base_filename;
-			if (file_exists($_SERVER['DOCUMENT_ROOT'] .$file))
+			if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/' .$file))
 				return true;
 		}
 		return false;
@@ -99,7 +100,7 @@ class file
 	public static function _extension(string $str): string
 	{
 		$str_array = explode('.', $str);
-		return string::_strtolower(end($str_array));
+		return str::_strtolower(end($str_array));
 	}
 
 /*

@@ -95,12 +95,7 @@ class User
 
 					if ($remember) {
 						$hash = Hash::generateRandomString(35);
-						$hashCheck = $this->_db->get('user_session', array('user_id', '=', $this->data()->salt));
-
-						if (!$hashCheck->count())
-							$this->_db->insert('users_session', array('user_id' => $this->data()->id, 'hash' => $hash));
-						else
-							$hash = $hashCheck->first()->hash;
+						$this->_db->update('users', array('session', '=', $hash),$this->data()->id,'id');
 
 						Cookie::put($this->_cookieName, $hash, Config::get('remember/cookie_expiry'));
 					}
