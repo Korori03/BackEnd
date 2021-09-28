@@ -55,6 +55,38 @@ spl_autoload_register(function($class_name){
 });
 
 /*
+	* Fix Document Root Path
+	* @ Version 1.0.0
+	* @ Since 4.0.2
+*/
+	if ((!isset($_SERVER['DOCUMENT_ROOT'])) OR (empty($_SERVER['DOCUMENT_ROOT']))) {
+		if(isset($_SERVER['SCRIPT_FILENAME']))
+			$_SERVER['DOCUMENT_ROOT'] = str_replace( '\\', '/', substr($_SERVER['SCRIPT_FILENAME'], 0, 0-strlen($_SERVER['PHP_SELF'])));
+		elseif(isset($_SERVER['PATH_TRANSLATED']))
+			$_SERVER['DOCUMENT_ROOT'] = str_replace( '\\', '/', substr(str_replace('\\\\', '\\', $_SERVER['PATH_TRANSLATED']), 0, 0-strlen($_SERVER['PHP_SELF'])));
+		else
+			$_SERVER['DOCUMENT_ROOT'] = '/';
+	}
+	$_SERVER['DOCUMENT_ROOT'] = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT']);
+	if (substr($_SERVER['DOCUMENT_ROOT'], -1) != '/')
+		$_SERVER['DOCUMENT_ROOT'] .= '/';
+
+/*
+	* Module Loader
+	* @ Version 1.0.0
+	* @ Since 4.0.2
+*/
+	$modules = array(
+		'dompdf'=>'autoload.inc.php'
+	);
+	foreach($modules as $module=>$loader)
+    {
+		if(file_exists("core/modules/{$module}/{$loader}"))
+			require_once("core/modules/{$module}/{$loader}");
+	}
+
+
+/*
 	* Get Content Mangement Options for Webpage
 	* @ Version 1.0.0
 	* @ Since 4.0.1
@@ -70,11 +102,11 @@ spl_autoload_register(function($class_name){
 	* @ Version 1.0.3
 	* @ Since 4.0.0
 */	
-if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Session::get('session/session_name'))){
+if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Config::get('session/session_name'))){
 	$hash = Cookie::get(Config::get('remember/cookie_name'));
-	$hashCheck = DataBase::getInstance()->get('users_session',array('hash','=',$hash));
+	$hashCheck = DataBase::getInstance()->get('users',array('session','=',$hash));
 	if($hashCheck->count()){
-		$user = new User($hashCheck->first()->user_id);
+		$user = new User($hashCheck->first()->id);
 		$user->login();
 	}
 }

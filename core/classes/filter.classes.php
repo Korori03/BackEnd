@@ -29,6 +29,7 @@ class filter
         if (arr::in($variable, $yesList) || cast::_float($variable) !== 0.0)
             return true;
 
+
         if (arr::in($variable, $noList))
             return false;
 

@@ -9,7 +9,7 @@
 /*
 	* JSON Template Class
 	* @since 1.0.0
-*/
+*/	
 declare(strict_types=1);
 class Json {
 
@@ -56,7 +56,6 @@ class Json {
 	* @Param (String JSon)
 */	
 	public static function toSTD(string $json):object {
-
 		$array = self::decode($json,true);
 		return arr::_toObject($array);
 	}

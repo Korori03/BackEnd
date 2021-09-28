@@ -100,9 +100,10 @@ class Template {
 	* @Param (String Tpl)
 */
 	public function readtpl(string $tpl_temp):string{
-		$extension = file::_extension($tpl_temp);
-		if(str::_strtolower($extension) == 'tpl'){
-			if (!file::_exist($this->template_dir . Options::get('template') . '/'.$tpl_temp))
+		$extension = explode('.',$tpl_temp);
+		$extension = end($extension);
+		if(strtolower($extension) == 'tpl'){
+			if (!file_exists($this->template_dir . Options::get('template') . '/'.$tpl_temp)) 
 				return "Error loading template file <br />";
 			else
 				return file_get_contents($this->template_dir . Options::get('template') . '/'.$tpl_temp);

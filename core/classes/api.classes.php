@@ -16,8 +16,8 @@ class Api
 	public static  		$_SessionApi;
 
 	public static		$_items,
-						$_callList
-						= 	array();
+		$_callList
+		= 	array();
 
 	/*
 	* Constructor for API Class
@@ -35,7 +35,7 @@ class Api
 				self::$_SessionApi = $data->session;
 			else
 				self::UserCheck();
-		} else if (isset($data->api) && isset($data->secret)) {
+		} else if (isset($data->username) && isset($data->password)) {
 			self::UserCheck();
 		}
 	}
@@ -47,14 +47,7 @@ class Api
 */
 	public static function checkSession(string $ip, string $session): bool
 	{
-		$sql = sprintf("SELECT id FROM " . Config::get('table/api') . " WHERE ip = '%s' and session = '%s' LIMIT 1;", $ip, $session);
-		$check = Database::getInstance()->query($sql);
-		return ($check->count() > 0 ? true : false);
-	}
-
-	public static function login(string $api, string $secret): bool
-	{
-		$sql = sprintf("SELECT id FROM " . Config::get('table/api') . " WHERE api = '%s' and secret = '%s' LIMIT 1;", $api, $secret);
+		$sql = sprintf("SELECT id FROM " . Config::get('table/users') . " WHERE ip = %s and session =%s LIMIT 1;", $ip, $session);
 		$check = Database::getInstance()->query($sql);
 		return ($check->count() > 0 ? true : false);
 	}
@@ -64,34 +57,17 @@ class Api
 	* @since 4.5.1
 	* @ Param (String,String)
 */
-	public static function _SetSessionID(string $api, string $secret): string
+	public static function _SetSessionID(string $username, string $password): string
 	{
 		return Hash::make(
 			Config::get('api/key') .
-				$api .
-				$secret .
+				$username .
+				$password .
 				self::_GetIP(false) .
 				date::_custom(null, "Ymdhis")
 		);
 	}
 
-	public static function _CreateAPIKey(): string
-	{
-		return Hash::randPass(
-					Hash::make(Config::get('api/keycreate')) .
-					Hash::make(self::_GetIP(false)) .
-					Hash::make(date::_custom(null, "Ymdhis"))
-		);
-	}
-
-	public static function _CreateSecretKey(): string
-	{
-		return Hash::randPass(
-				Hash::make(Config::get('api/sessioncreate')) .
-				Hash::make(self::_GetIP(false)) .
-				Hash::make(date::_custom(null, "Ymdhis"))
-			);
-	}
 	/*
 	* Get IP
 	* @since 4.5.1
@@ -115,8 +91,9 @@ class Api
 	* @since 4.5.1
 	* @ Param (Boolean,Object,Integer)
 */
-	public static function jsonFormat(bool $status, mixed $object, int $code = 203): void
+	public static function jsonFormat(bool $status, mixed $object, int $code = 203): mixed
 	{
+		header_remove();
 		http_response_code($code);
 		self::$_items["status"] = cast::_string($status);
 		self::$_items["object"] = $object;
@@ -126,6 +103,7 @@ class Api
 			self::$_items,
 			JSON_PRETTY_PRINT
 		);
+		exit();
 	}
 
 	/*
@@ -202,23 +180,23 @@ class Api
 		$data = json::decode(file_get_contents("php://input"), true);
 
 		$validation = $validate->check($data, array(
-			'api'	=>	array('name' => 'API', 'required' => true),
-			'secret'	=>	array('name' => 'Secret', 'required' => true)
+			'username'	=>	array('name' => 'Username', 'required' => true),
+			'password'	=>	array('name' => 'Password', 'required' => true)
 		));
 
 		if ($validation->passed()) {
+			$user = new User();
+			$username = $data['username'];
+			$password =  $data['password'];
 
-			$api = $data['api'];
-			$secret =  $data['secret'];
-
-			$login = self::login($api, $secret);
+			$login = $user->login($username, $password);
 
 			if ($login) {
 				$products_arr["status"]		= true;
 				$products_arr["object"]		= (object)["message" => "Login Session Created Successfully"];
-				$products_arr["session"]	=  self::_SetSessionID($api, $secret);
+				$products_arr["session"]	=  self::_SetSessionID($username, $password);
 
-				$sql = sprintf("Update " . Config::get('table/api') . " SET `ip` = '%s', `session` = '%s' WHERE `api` ='%s' AND `secret` = '%s';",self::_GetIP(),$products_arr["session"],$api,$secret);
+				$sql = sprintf("Update " . Config::get('table/users') . " SET `ip` = '%s', `session` = '%s' WHERE `username` ='%s';",self::_GetIP(),$products_arr["session"],$username);
 
 				Database::getInstance()->query($sql);
 				self::$_SessionApi = $products_arr["session"];
@@ -272,7 +250,7 @@ class Api
 			}
 		} else {
 			if (empty(self::$_SessionApi)) {
-				if (isset($data->api) && isset($data->secret)) {
+				if (isset($data->username) && isset($data->password)) {
 					$return = self::UserCheck();
 					if (Input::get('login')) {
 						self::jsonFormat($return['status'], $return['object']);
@@ -328,7 +306,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Array,Object,String)
 */
-	public static function APISetup(mixed $columns,mixed $data, string $type = 'where'): string
+	public static function APISetup(mixed $columns,mixed $data, string $type = 'where'): array
 	{
 
 		$update = array();
@@ -342,26 +320,20 @@ class Api
 				$where[$key] = $data->{$key};
 		}
 
-		switch(str::_strtolower($type)){
-			case 'where':
-				$wheres = array();
-				for ($x = 0; $x < count($columns); $x++) {
-					if (array_key_exists($columns[$x], $where))
-						$wheres[] = '`' . $columns[$x] . '`' . (!empty($data->{$columns[$x]}->operator) ? ' ' . $data->{$columns[$x]}->operator . ' ' : '=') . ":$columns[$x]";
-				}
-				return implode(' AND ', $wheres);
-				break;
-			case 'update':
-				$updates = array();
-				for ($x = 0; $x < count($columns); $x++) {
-					if (array_key_exists($columns[$x], $update))
-						$updates[] = '`' . $columns[$x] . "`=:$columns[$x]";
-				}
-				$concat =  ' , ';
-				return implode(' , ', $updates);
-				break;
+		$updates = array();
+		for ($x = 0; $x < count($columns); $x++) {
+			if (array_key_exists($columns[$x], $update))
+				$updates[] = '`' . $columns[$x] . "`=:$columns[$x]";
 		}
-		return '';
+
+		$wheres = array();
+		for ($x = 0; $x < count($columns); $x++) {
+			if (array_key_exists($columns[$x], $where))
+				$wheres[] = '`' . $columns[$x] . '`' . (!empty($data->{$columns[$x]}->operator) ? ' ' . $data->{$columns[$x]}->operator . ' ' : '=') . ":$columns[$x]";
+		}
+		$concat = ($type === 'where' ? ', ' : ' AND ');
+
+		return array(implode(' AND ', $wheres), implode($concat, $updates));
 	}
 
 	/*
@@ -401,6 +373,7 @@ class Api
 	{
 		$_header 	=	['Content-Type: application/json'];
 		$curl 		=	curl_init();
+
 
 		switch (str::_strtoupper($method)) {
 			case 'POST':
@@ -452,15 +425,9 @@ class Api
 				break;
 		}
 
-
-		if ($error_status){
-			self::$_items["status"] = 'false';
-			self::$_items["object"] = $error_status;
-			self::$_items["session"] = self::$_SessionApi;
-			return self::$_items;
-		}
-
+		if ($error_status)
+			return self::jsonFormat(false, $error_status);
 		else
-			return Json::decode($result);
+			return self::jsonFormat(true, $result);
 	}
 }

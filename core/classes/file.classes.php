@@ -27,14 +27,13 @@ class file
 		$possible_extensions = cast::_array($possible_extensions);
 		if (strlen(pathinfo($base_filename)['extension']) == 0) {
 			foreach ($possible_extensions as $extension) {
-
 				$file = "$base_filename.$extension";
-				if (file_exists($_SERVER['DOCUMENT_ROOT']. '/' .$file))
+				if (file_exists($_SERVER['DOCUMENT_ROOT']. $file))
 					return true;
 			}
 		} else {
 			$file = $base_filename;
-			if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/' .$file))
+			if (file_exists($_SERVER['DOCUMENT_ROOT'] .$file))
 				return true;
 		}
 		return false;
@@ -100,7 +99,7 @@ class file
 	public static function _extension(string $str): string
 	{
 		$str_array = explode('.', $str);
-		return str::_strtolower(end($str_array));
+		return string::_strtolower(end($str_array));
 	}
 
 /*
@@ -118,5 +117,18 @@ class file
 				return true;
 		}
 		return false;
+	}
+
+/*
+	* Create Folder Path
+	* @Since 4.0.2
+	* @Param (String path)
+*/
+	public static function createFolderPath($path):bool {
+		$path = dirname($path);
+		if (is_dir($path)) return true;
+		$prev_path = substr($path, 0, strrpos($path, '/', -2) + 1 );
+		$return = self::createFolderPath($prev_path);
+		return ($return && is_writable($prev_path)) ? mkdir($path) : false;
 	}
 }

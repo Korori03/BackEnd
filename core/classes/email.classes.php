@@ -133,7 +133,7 @@ class Email {
 		  $filename = basename($path);
 		  if ( $name == '' )
 			$name = $filename;
-
+		  
 		  $this->attachment[] = array(
 			0 => $path,
 			1 => $name,
@@ -166,7 +166,7 @@ class Email {
 	* Add Address to Array
 	* @Since 4.0.0
 	* @Param (Array To)
-*/	
+*/
 	public function addAddressArray(array $to):void{
 		
 		foreach($to as $key =>$name){

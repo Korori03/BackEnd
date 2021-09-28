@@ -95,7 +95,12 @@ class User
 
 					if ($remember) {
 						$hash = Hash::generateRandomString(35);
-						$this->_db->update('users', array('session', '=', $hash),$this->data()->id,'id');
+						$hashCheck = $this->_db->get('user_session', array('user_id', '=', $this->data()->salt));
+
+						if (!$hashCheck->count())
+							$this->_db->insert('users_session', array('user_id' => $this->data()->id, 'hash' => $hash));
+						else
+							$hash = $hashCheck->first()->hash;
 
 						Cookie::put($this->_cookieName, $hash, Config::get('remember/cookie_expiry'));
 					}
@@ -117,6 +122,7 @@ class User
 		if (!is_null($this->_permissions)) {
 			if (strlen(cast::_string($this->_permissions)) > 0) {
 				$permission = json_decode($this->_permissions, true);
+				
 				if (filter::bool(cast::_string($permission[$key])))
 					return true;
 			}
@@ -132,7 +138,7 @@ class User
 	public function hasUserItem(string $key): string
 	{
 		if (strlen($this->_useritem) > 0) {
-			$permission = json::decode($this->_useritem, true);
+			$permission = json_decode($this->_useritem, true);
 			return $permission[$key];
 		}
 		return '';
@@ -146,7 +152,7 @@ class User
 	public function hasUserSettings(string $key): string
 	{
 		if (strlen($this->_usersettings) > 0) {
-			$permission = json::decode($this->_usersettings, true);
+			$permission = json_decode($this->_usersettings, true);
 			return $permission[$key];
 		}
 		return '';
@@ -168,15 +174,12 @@ class User
 */
 	public function logout(): void
 	{
-		$this->_db->delete('users_session', array('user_id', '=', $this->data()->id));
+		@$this->_db->delete('users_session', array('user_id', '=', $this->data()->id));
 		$this->_isLoggedIn = false;
 		$this->_data = '';
 		$this->_permissions = '';
-		if(SESSION::exists($this->_sessionName))
-			SESSION::delete($this->_sessionName);
-
-		if(Cookie::exists($this->_sessionName))
-			Cookie::delete($this->_cookieName);
+		SESSION::delete($this->_sessionName);
+		@Cookie::delete($this->_cookieName);
 	}
 
 

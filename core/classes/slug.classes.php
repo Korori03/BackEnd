@@ -30,7 +30,7 @@ class Slug{
 	* @since 4.0.0
 	* @param (String Name,Array Options)
 */
-	public static function _url(mixed $str, array $options = array()): string {
+	public static function _url(mixed $str, $options = array()): string {
 		$str = mb_convert_encoding(cast::_string($str), 'UTF-8', mb_list_encodings());
 
 		$defaults = array(

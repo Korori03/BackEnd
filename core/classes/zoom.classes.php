@@ -99,7 +99,7 @@ class Zoom
     * @ Since 4.5.1
     * @param (String method,String Path,Array QueryParams,Array PathParams,String body)
 */
-    public function doRequest($method, $path, $queryParams = [], $pathParams = [], $body = ''):bool|object|array
+    public function doRequest($method, $path, $queryParams = [], $pathParams = [], $body = ''):mixed
     {
         if (is_array($body)) {
             if (!count($body)) {
@@ -158,7 +158,7 @@ class Zoom
         $token = ['iss' => $apiKey, 'exp' => time() + 60];
         $header = ['typ' => 'JWT', 'alg' => 'HS256'];
 
-        $toSign = self::urlsafeB64Encode(json::encode($header)) .  '.' .  self::urlsafeB64Encode(json::encode($token));
+        $toSign = self::urlsafeB64Encode(json_encode($header)) .  '.' .  self::urlsafeB64Encode(json_encode($token));
 
         $signature = hash_hmac('SHA256', $toSign, $apiSecret, true);
 
@@ -264,8 +264,8 @@ class Zoom
         if ($this->responseCode() == 200) {
             return $response;;
         } else {
-            print_r($response);
-            exit();
+           // print_r($response);
+           // exit();
         }
     }
 
@@ -360,7 +360,6 @@ class Zoom
             return $response;
         } else {
             $this->zoomError = $response;
-
             return false;
         }
     }
@@ -433,6 +432,7 @@ class Zoom
             return $response;
         } else {
             $this->zoomError = $response;
+
             return false;
         }
     }

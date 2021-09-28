@@ -27,11 +27,13 @@ class arr
 			foreach ($array as $k => $v) {
 				if (is_array($v)) {
 					foreach ($v as $k2 => $v2) {
-						if ($k2 == $on)
+						if ($k2 == $on) {
 							$sortable_array[$k] = $v2;
+						}
 					}
-				} else
+				} else {
 					$sortable_array[$k] = $v;
+				}
 			}
 
 			switch ($order) {
@@ -56,17 +58,16 @@ class arr
 	* @Since 4.0.0
 	* @Param (Array Object)
 */
-	public static function _toObject(mixed $array): mixed
+	public static function _toObject(array $array): object
 	{
-
 		if (is_array($array)) {
 			$object = new stdClass();
 			foreach ($array as $key => $value)
 				$object->$key = self::_toObject($value);
 
 			return $object;
-		}
-		return $array;
+		} else
+			return [];
 	}
 
 	/*
@@ -112,6 +113,7 @@ class arr
 */
 	public static function _replace(array $ary1,array $ary2,string $string): string
 	{
+
 		if (count($ary1) !== count($ary2))
 			return '';
 
@@ -199,9 +201,9 @@ class arr
 /*
 	* Searc Array with Keys
 	* @Since 4.1.5
-	* @Param (Mixed Array,String Search,?String Field)
+	* @Param (Array Array,String Search,?String Field)
 */
-	public static function search(mixed $array, $search, ?string $field = null): string
+	public static function search(array $array, $search, ?string $field = null): string
 	{
 		$search = cast::_string($search);
 		foreach ($array as $key => $element) {
@@ -276,7 +278,7 @@ class arr
 		$inArray = in_array($value, $array, true);
 
 		if ($returnKey) {
-			if ($inArray)
+			if ($inArray) 
 				return array_search($value, $array, true);
 
 			return '';

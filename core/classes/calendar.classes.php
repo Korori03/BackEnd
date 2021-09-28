@@ -92,12 +92,13 @@ class Calendar{
 		$first_of_month = gmmktime(0,0,0,$month,1,$year);
 		$first_day = 0;
 
-		list($month, $year, $weekday) = explode(',',gmstrftime('%m,%Y,%w',$first_of_month));
+		list($month, $year, $month_name, $weekday) = explode(',',gmstrftime('%m,%Y,%B,%w',$first_of_month));
 	
 		$weekday = ($weekday + 7 - $first_day) % 7;
 		
-		for($day = 1,$days_in_month=gmdate('t',$first_of_month);$day<=$days_in_month; $day++,$weekday++){
 
+		for($day = 1,$days_in_month=gmdate('t',$first_of_month);$day<=$days_in_month; $day++,$weekday++){
+			
 			if($weekday == 7){
 				$weekday   = 0; 
 				$calendar .= "</tr><tr>";	

@@ -7,7 +7,7 @@
 	* Developed by: Ami (亜美) Denault
 */
 declare(strict_types=1);
-class Pagination {
+class Pagination {		
 		
 	public	$itemsPerPage,
 			$range,
@@ -22,7 +22,7 @@ class Pagination {
        
 	public function __construct()
 	{
-		
+
 		$this->itemsPerPage = 5;
 		$this->currentPage  = 1;
 		$this->total		= 0;
@@ -39,15 +39,16 @@ class Pagination {
 		
 	}
        
-	public function pagination()
+	public function generate()
 	{
-		$this->_itemHtml = $this->_getHTMLData();
+		$this->_itemHtml = $this->_getHTMLData();	
 		return $this->_itemHtml;
 	}
 
 	
 	private function  _getHTMLData()
 	{
+		
 		$layout = new Template("_pagination.tpl");
 		$list_item = new Template("_pagination_item.tpl");
 		$list ='';
@@ -73,7 +74,6 @@ class Pagination {
 			$list_item->setArray(array('active'=>'','link'=>$this->_link .'/'.($this->currentPage+1).'-' .$this->get_type,'name'=>$this->_navigation['next']));
 			$list .= $list_item->show();
 		}
-
 		$layout->setArray(array('list'=>$list));
 		return $layout->show();
 	}

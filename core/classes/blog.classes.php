@@ -14,7 +14,7 @@ declare(strict_types=1);
 class Blog
 {
 
-    private const URL = '/blog/{id}-{slug}';
+    private const url = '/blog/{id}-{slug}';
 
    
     public static function getPosts(int $offset = 0, int $perpage = 5): string
@@ -30,29 +30,19 @@ class Blog
                 'date_post' => $post->date_posted,
                 'title' => $post->title,
                 'content' => bbcode::format(str::_limitWords($post->content, 250)),
-                'url' => self::URLReplace(array('{slug}'=>slug::_url($post->title),'{id}'=> $post->id))
+                'url' => str_replace('{slug}', slug::_url($post->title), str_replace('{id}', $post->id, self::url))
             ));
             $list .= $blog_posts->show();
         }
 
         return $list;
     }
-
-    private static function URLReplace(array $search):string{
-        $url = self::URL;
-        foreach($search as $key => $value){
-            $url = str_replace($key,$value,$url);
-        }
-
-        return $url;
-    }
-
     public static function getPost(int $post): string
     {
         if (empty($post))
             return '';
 
-        $sql = sprintf("SELECT * FROM blog WHERE id = %s;", $post);
+        $sql = sprintf("SELECT * FROM blog WHERE id =;", $post);
         $post = Database::getInstance()->query($sql);
         $list = '';
 
