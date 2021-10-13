@@ -20,7 +20,7 @@ class Config{
 	* @ Since 4.0.0
 	* @ Param (String Path)
 */
-	public static function get(string $path=null):string|int{
+	public static function get(string $path=null){
 		if($path){
 			$config = $GLOBALS['config'];
 			$path =explode('/',$path);

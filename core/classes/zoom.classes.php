@@ -145,7 +145,7 @@ class Zoom
 
         curl_close($ch);
 
-        return json::decode($result, true);
+        return json::decode(cast::_string($result), true);
     }
 
 /*

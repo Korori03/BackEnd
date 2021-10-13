@@ -1,4 +1,5 @@
 <?php
+
 /*
 	Initize Set
 	Developed by: Ami Denault
@@ -14,15 +15,15 @@
 	* Start Session
 */
 
-declare(strict_types=1);
 session_start();
 
-ini_set("display_errors", "1");
-ini_set("track_errors", "1");
-ini_set("html_errors", "1");
+
+ini_set("display_errors", 1);
+ini_set("track_errors", 1);
+ini_set("html_errors", 1);
 error_reporting(E_ALL);
 
-ini_set('zlib.output_compression_level', "9");
+ini_set('zlib.output_compression_level', 9);	
 ob_start("ob_gzhandler");
 
 /*
@@ -54,37 +55,6 @@ spl_autoload_register(function($class_name){
 	}
 });
 
-/*
-	* Fix Document Root Path
-	* @ Version 1.0.0
-	* @ Since 4.0.2
-*/
-	if ((!isset($_SERVER['DOCUMENT_ROOT'])) OR (empty($_SERVER['DOCUMENT_ROOT']))) {
-		if(isset($_SERVER['SCRIPT_FILENAME']))
-			$_SERVER['DOCUMENT_ROOT'] = str_replace( '\\', '/', substr($_SERVER['SCRIPT_FILENAME'], 0, 0-strlen($_SERVER['PHP_SELF'])));
-		elseif(isset($_SERVER['PATH_TRANSLATED']))
-			$_SERVER['DOCUMENT_ROOT'] = str_replace( '\\', '/', substr(str_replace('\\\\', '\\', $_SERVER['PATH_TRANSLATED']), 0, 0-strlen($_SERVER['PHP_SELF'])));
-		else
-			$_SERVER['DOCUMENT_ROOT'] = '/';
-	}
-	$_SERVER['DOCUMENT_ROOT'] = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT']);
-	if (substr($_SERVER['DOCUMENT_ROOT'], -1) != '/')
-		$_SERVER['DOCUMENT_ROOT'] .= '/';
-
-/*
-	* Module Loader
-	* @ Version 1.0.0
-	* @ Since 4.0.2
-*/
-	$modules = array(
-		'dompdf'=>'autoload.inc.php'
-	);
-	foreach($modules as $module=>$loader)
-    {
-		if(file_exists("core/modules/{$module}/{$loader}"))
-			require_once("core/modules/{$module}/{$loader}");
-	}
-
 
 /*
 	* Get Content Mangement Options for Webpage
@@ -94,19 +64,38 @@ spl_autoload_register(function($class_name){
 	$dboptions = Database::getInstance()->get(Config::get('table/options'));
 	$GLOBALS['options'] = array();
 	foreach($dboptions->results() as $option){
-		if(filter::bool($option->autoload))
-			$GLOBALS['options'][$option->option_name] = $option->option_value;
+		
+		if($option->autoload =='yes'){
+			$option_name = $option->option_name;
+			$option_value = $option->option_value;
+			$GLOBALS['options'][$option_name] = $option_value;
+		}
+	
 	}
+
+	/*
+	* Module Loader
+	* @ Version 1.0.0
+	* @ Since 4.0.2
+*/
+$modules = array(
+	'dompdf'=>'autoload.inc.php'
+);
+foreach($modules as $module=>$loader)
+{
+	if(file_exists("core/modules/{$module}/{$loader}"))
+		require_once("core/modules/{$module}/{$loader}");
+}
 /*
 	* Get Cookie Instances for Remember Me
 	* @ Version 1.0.3
 	* @ Since 4.0.0
 */	
-if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Config::get('session/session_name'))){
+if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Session::get('session/session_name'))){
 	$hash = Cookie::get(Config::get('remember/cookie_name'));
-	$hashCheck = DataBase::getInstance()->get('users',array('session','=',$hash));
+	$hashCheck = DataBase::getInstance()->get('users_session',array('hash','=',$hash));
 	if($hashCheck->count()){
-		$user = new User($hashCheck->first()->id);
+		$user = new User($hashCheck->first()->user_id);
 		$user->login();
 	}
 }

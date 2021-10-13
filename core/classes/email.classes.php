@@ -26,9 +26,8 @@ class Email {
 			$_Send_to 		=	'',
 			$_Content_Type 	= 	'html',
 			$_ErrorInfo 	= 	'',
-			$_ErrorBool 	= 	false;
-			
-	protected   $attachment     = array();
+			$_ErrorBool 	= 	false,
+			$attachment     = array();
 
 /*
 	* Construct Function
@@ -47,7 +46,7 @@ class Email {
 	* @Since 4.0.0
 	* @Param (None)
 */
-	public function send():bool{
+	public function send(){
 		$separator = md5(date::_human(NULL));
 
 		//Header
@@ -56,36 +55,38 @@ class Email {
         $headers .= "Content-Type: multipart/mixed; boundary = $separator".$this->_eol .$this->_eol;
 
         //Text
-        $body = "--$separator\r\n";
+        $body = "--$separator".$this->_eol;
         $body .= "Content-Type: text/". $this->_Content_Type ."; charset=ISO-8859-1".$this->_eol;
-        $body .= "Content-Transfer-Encoding: base64" .$this->_eol.$this->_eol;
+        $body .= "Content-Transfer-Encoding: base64" .$this->_eol;
         $body .= chunk_split(base64_encode($this->_Message));
 
 		//Loop through Attachments
 		for($x=0;$x < count($this->attachment);$x++){
-			 if(is_file($this->attachment[$x][0]) && file::_exist($this->attachment[$x][0])) {
+			 //if(is_file($this->attachment[$x][0]) && filesystem::_exist($this->attachment[$x][0])) {
 				$filename = $this->attachment[$x][1];
 				$path = $this->attachment[$x][0];
 				$type = $this->attachment[$x][2];
 
-				$file = @fopen($path,'r');
-				$data = @fread($file,filesize($path));
-				@fclose($file);
-				$attachment = chunk_split(base64_encode($data));
+				$file = fopen($path,'rb');
+				$data = fread($file,filesize($path));
+				fclose($file);
+ 				$attachment = chunk_split(base64_encode($data));
 
 				$body .= "--$separator".$this->_eol;
 				$body.= sprintf("--%s%s", $separator, $this->_eol);
 				$body.= sprintf("Content-Type: %s; name=\"%s\"%s", $type, $filename, $this->_eol);
-				$body.= sprintf("Content-Transfer-Encoding: %s%s",'base64' , $this->_eol);
-				$body.= sprintf("Content-Disposition: %s; filename=\"%s\"%s", 'attachment', $filename, $this->_eol.$this->_eol);
+				$body.= "Content-Transfer-Encoding: base64" . $this->_eol;
+				$body.= "Content-Disposition: attachment" .$this->_eol;
 				$body.= $attachment;
 				$body .= $this->_eol.$this->_eol;
-				$body.= sprintf("--%s--%s", $separator, $this->_eol);
-			 }
-			 else{
-				$this->_ErrorInfo .='Unable to find: ';
-				return false;
-			 }
+				$body.= sprintf("--%s--", $separator);
+
+
+			// }
+			// else{
+			//	$this->_ErrorInfo .='Unable to find: ';
+			//	return false;
+			// }
 		}
 		
 		//Loop through Senders
@@ -125,7 +126,7 @@ class Email {
 */		
 	public function AddAttachment(string $path,string $name = '',string $type = 'application/octet-stream'):bool {
 		try {
-		  if (!is_file($path) && !file::_exist($this->attachment[0])) {
+		  if (!is_file($path) && !filesystem::_exist($this->attachment[0])) {
 				$this->_ErrorInfo .= 'Unable to Find: ' .$path;
 				$this->_ErrorBool = true;
 				return true;
@@ -139,7 +140,7 @@ class Email {
 			1 => $name,
 			2 => $type
 		  );
-		} 
+		}
 		catch (Exception $e) {
 			$this->_ErrorInfo .= $e->getMessage();
 			$this->_ErrorBool = true;
@@ -166,7 +167,7 @@ class Email {
 	* Add Address to Array
 	* @Since 4.0.0
 	* @Param (Array To)
-*/
+*/	
 	public function addAddressArray(array $to):void{
 		
 		foreach($to as $key =>$name){

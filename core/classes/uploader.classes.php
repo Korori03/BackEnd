@@ -50,7 +50,7 @@ class Uploader{
 		
 		if(rename($file_temp_path, $file_path))
 			@unlink($file_temp_path);
-		
+
 		echo Json::returnJson(true, self::$_upload_dir . $pre_file.'_'.Slug::_url($path_parts['filename']).'.'.$path_parts['extension']);
 	}
 
@@ -99,7 +99,7 @@ class Uploader{
 	* @param (String File Input Name, Integer Width, String Filename,Integer Quality, Integer Height)
 */
 	public function resizeImage(string $pathToImage,int $imagewidth,string $filename,int $quality = 100,string $heighttype = 'auto' ){
-		$ext =  file::_extension($filename);
+		$ext =  filesystem::_extension($filename);
 		
 		if($ext === 'png')
 			$img = imagecreatefrompng( "{$pathToImage}{$filename}" );
@@ -108,7 +108,7 @@ class Uploader{
 		else
 			$img = imagecreatefromjpeg( "{$pathToImage}{$filename}" );
 
-		
+
 		$width = imagesx( $img );
 		$height = imagesy( $img );
 
@@ -123,8 +123,8 @@ class Uploader{
 			$new_width = cast::_int(floor( $width * ( $heighttype / $height ) ));
 		else
 			$new_width = cast::_int($imagewidth);
-			
-			
+
+
 		$tmp_img = imagecreatetruecolor( $new_width, $new_height );
 		
 		imagecopyresized( $tmp_img, $img, 0, 0, 0, 0, $new_width, $new_height, $width, $height );
@@ -135,14 +135,14 @@ class Uploader{
 		else
 			imagejpeg( $tmp_img, "{$pathToImage}{$filename}",$quality );
 	}
-	
+
 /*
 	* Create Thumb Image
 	* @since 4.0.0	
 	* @param (String File Path to Image, String File Path to Thumb,Integer Width, String Filename)
 */
 	public function createThumbs(string $pathToImage,string  $pathToThumb,int $thumbWidth,string $filename ) {
-		$ext = file::_extension($filename);
+		$ext = filesystem::_extension($filename);
 
 		if($ext === 'png')
 			$img = imagecreatefrompng( "{$pathToImage}{$filename}" );
@@ -170,23 +170,12 @@ class Uploader{
 		
 	
 	}
-/*
-	* Remove File
-	* @since 4.0.0	
-	* @param (String FilePath)
-*/	
-	public static function removeFile(string $path):void{
-		if(file_exists($path)){	
-			$fh = fopen($path, 'w');	
-			fclose($fh);
-			unlink($path);
-		}
-	}	
+
 
 
 /*
 	* Create Guid
-	* @since 4.0.0	
+	* @since 4.0.0
 	* @param (String NameSpace)
 */
 	public function create_guid(mixed $namespace = '') {
@@ -217,12 +206,12 @@ class Uploader{
 	* @param (String Path)
 */	
 	public function typeExt(string $path) {
-		$extension =  strtolower(file::_extension($path));
+		$extension =  strtolower(filesystem::_extension($path));
 		$type ='file';
 		if($extension === 'png' || $extension === 'gif' || $extension === 'jpg' || $extension === 'jpeg'){
 			$type = 'image';
 		}
-		return $type;	
+		return $type;
 	}
 
 	/*
@@ -231,7 +220,7 @@ class Uploader{
 		* @param (String File Input Name, String Folder, String Types, Integer Size, Integer Width, String Optional, Integer Height)
 	*/
 	public static function fileUpload(mixed $file_id,string $folder="/content/uploads/",string $types="",int $sizelimit = 20) {
-			
+
 		$file_name = '';	
 		$query = false;
 		
@@ -247,12 +236,12 @@ class Uploader{
 		if($types) {
 			if(!in_array($extension,$all_types)){
 				self::addError("This is not a valid file.");
-				self::removeFile($folder . $file_name);
+				FileSystem::_remove($folder . $file_name);
 				return array($query,self::errors(),'');
 			}
 		}
 		
-		self::removeFile($folder . $file_name);
+		FileSystem::_remove($folder . $file_name);
 		$size = filesize($_FILES[$file_id]['tmp_name']);
 		
 		if($size > ($sizelimit * 1092821)){
@@ -269,7 +258,7 @@ class Uploader{
 		}
 		else {
 			if(!$_FILES[$file_id]['size']) { 
-				self::removeFile($folder . $file_name);
+				FileSystem::_remove($folder . $file_name);
 				self::addError("Empty file found - please use a valid file.");
 			}
 			else{
@@ -296,5 +285,12 @@ class Uploader{
 	public static function errors(){
 		return self::$_errors;
 	}
+
+	public static function _writecontents($filepath, $content = "",$mode = 'a'):void
+    {
+		$out = fopen($filepath, $mode);
+		fwrite($out, $content.PHP_EOL);
+		fclose($out);
+    }
 }
 ?>

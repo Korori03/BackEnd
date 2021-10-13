@@ -22,9 +22,9 @@ class Pagination {
        
 	public function __construct()
 	{
-
+		
 		$this->itemsPerPage = 5;
-		$this->currentPage  = 1;
+		$this->currentPage  = 1;		
 		$this->total		= 0;
 		$this->range        = 5;
 		$this->get_type 	= 'page';

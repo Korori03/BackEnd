@@ -13,7 +13,7 @@ class Options
 	* @since 4.0.1
 	* @Param (String Path)
 */
-	public static function get(string $path = null): string|int
+	public static function get(string $path = null)
 	{
 		if ($path) {
 			$config = $GLOBALS['options'];

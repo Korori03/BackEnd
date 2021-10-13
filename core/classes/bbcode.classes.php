@@ -273,7 +273,7 @@ class BBCODE{
 		$src_parse = str_replace(array(" ","%20"),"",trim($src));
 
 		if(substr($src_parse,0,1) == '/'){
-			if(file::_exist(substr($src_parse,1))){
+			if(FileSystem::_exist(substr($src_parse,1))){
 				if($width != 0 && $height != 0)
 					return '<img src="'.$src_parse.'" alt="image" style="width:'.$width.'px; height:'.$height.'px;" />';
 				else
@@ -300,7 +300,7 @@ class BBCODE{
 
 		try{	
 			$feedURL = 'http://gdata.youtube.com/feeds/api/videos/'.$videoid;
-			$curl = curl_init($feedURL);														
+			$curl = curl_init($feedURL);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 			$data = curl_exec($curl);	
 

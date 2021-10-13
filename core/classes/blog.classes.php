@@ -16,7 +16,7 @@ class Blog
 
     private const url = '/blog/{id}-{slug}';
 
-   
+
     public static function getPosts(int $offset = 0, int $perpage = 5): string
     {
         $sql = sprintf("SELECT * FROM blog ORDER BY date_posted DESC LIMIT %b, %b;", $offset, $perpage);
@@ -24,7 +24,7 @@ class Blog
 
         $blog_posts = new Template("blog_posts.tpl");
         $list = '';
-        foreach ($posts->result() as $post) {
+        foreach ($posts->results() as $post) {
             $blog_posts->setArray(array(
                 'user' => $post->user,
                 'date_post' => $post->date_posted,

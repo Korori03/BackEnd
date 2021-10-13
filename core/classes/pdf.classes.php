@@ -6,31 +6,36 @@
 */
 
 /*
-	* Zoom
+	* PDF Class
 	* @Since 4.5.1
 */
 
 declare(strict_types=1);
 
-//require_once('libs/tcpdf/tcpdf.php');
 
 use Dompdf\Dompdf;
 
 class pdf
 {
 
-    private $_pdf, $_path,$_pages,$_html;
+    private $_pdf, $_path,$_html;
+    private $_pages = 1;
+    public $_setpages = 1;
 
 
     public function __construct($options = [])
     {
         $this->_pdf = new Dompdf();
     }
+    public function SetPages($pages):void
+    {
+        $this->_setpages =$pages;
+    }
 
     public function AddPage($html):void
     {
         $this->_html .= $html;
-        if($this->_pages > 1)
+        if($this->_pages > $this->_setpages)
             $this->_html .= '<div style="page-break-before: always;"></div>';
 
         $this->_pages++;
@@ -40,9 +45,9 @@ class pdf
     {
         $this->_pdf->loadHtml($this->_html);
 
-        if(file::createFolderPath($path)){
-            if(file::_exist($path))
-                file::_rmfile($path);
+        if(filesystem::createFolderPath($path)){
+            if(filesystem::_exist($path))
+                filesystem::_rmfile($path);
 
             $this->_path = $path;
             $this->_pdf->render();
@@ -50,45 +55,19 @@ class pdf
         }
     }
 
-    public function Email($options):bool
+    public function Email($options)
     {
-        $mail = new Email;
+        $mail = new Email();
+        $mail->Content_Type('html');
         $mail->setFrom('reminder@houstoncounty.org', 'Emailer');
-        $mail->addAddress($options['email'], $options['emailname']);
+        foreach(explode(',',$options['email']) as $email){
+            $mail->addAddress($email);
+        }
+
+
         $mail->Subject($options['subject']);
-        $mail->AddAttachment($this->_path);
+        $mail->AddAttachment($this->_path,$options['filename'],'application/pdf');
         $mail->Body($options['message']);
-        return $mail->send();
-
-
-        // $fileatt_type = "application/pdf";
-        // $fileatt_name = basename($this->_path);
-        // $file = fopen($this->_path, 'rb');
-        // $data = fread($file, filesize($this->_path));
-        // fclose($file);
-
-        // $message = '';
-        // $semi_rand = md5(cast::_string(time()));
-        // $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
-        // $headers = "From: " . $options['from'];
-        // $headers .= "\rMIME-Version: 1.0\r" .
-        //     "Content-Type: multipart/mixed;\r" .
-        //     " boundary=\"{$mime_boundary}\"";
-        // $message .= "This is a multi-part message in MIME format.\r\r" .
-        //     "--{$mime_boundary}\r" .
-        //     "Content-Type:text/plain; charset=\"iso-8859-1\"\r" .
-        //     "Content-Transfer-Encoding: 7bit\r\r";
-        // $message .= $options['message'];
-        // $data = chunk_split(base64_encode($data));
-        // $message .= "--{$mime_boundary}\r" .
-        //     "Content-Type: {$fileatt_type};\r" .
-        //     " name=\"{$fileatt_name}\"\r" .
-        //     "Content-Transfer-Encoding: base64\r\r" .
-        //     $data .= "\r\r" .
-        //     "--{$mime_boundary}--\r";
-
-       // $sent = mail($options['to'], $options['subject'], $options['message'], $headers);
-
-        //return cast::_bool($sent);
+        return  $mail->send();
     }
 }

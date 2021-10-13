@@ -64,7 +64,7 @@ class str{
 		} 
 		while (true) { 
 			$replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number);
-			if ($replaced != $number) { 
+			if ($replaced != $number) {
 				$number = $replaced;
 			} else {
 				break; 
@@ -290,7 +290,7 @@ class str{
 */
 	public static function _toAscii(string $string): string{
 		$ascii = array('@:#([0-9]{2,3}):@' => '&#$1;','@:amp:@' => '&amp;','@:quot:@'=>'\'');
-		foreach ($ascii as $search => $replace)  								
+		foreach ($ascii as $search => $replace)
 			$string = preg_replace($search, $replace, $string);
 			
 		return $string;
@@ -366,7 +366,7 @@ class str{
         return $string;
     }
 
-	public static function _MetaDescription(string $string, int $limit = 50): string
+	public static function _MetaDescription(string $string, int $limit = 10): string
 	{
 		return self::_limitWords(strip_tags(str_replace(array('\'', '"'), '', $string)),$limit);
 	}
@@ -419,4 +419,9 @@ class str{
     {
         return str_pad($number, $length, '0', STR_PAD_LEFT);
     }
+
+	public static function _striptags($string) {
+		$string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
+		return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+	 }
 }
