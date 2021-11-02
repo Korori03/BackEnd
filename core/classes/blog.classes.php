@@ -42,7 +42,7 @@ class Blog
         if (empty($post))
             return '';
 
-        $sql = sprintf("SELECT * FROM blog WHERE id =;", $post);
+        $sql = sprintf("SELECT * FROM blog WHERE id = '%s';", $post);
         $post = Database::getInstance()->query($sql);
         $list = '';
 

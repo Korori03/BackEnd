@@ -10,7 +10,7 @@
 	* Setup Database Class
 	* @since 4.0.0
 */
-
+declare(strict_types=1);
 class Database{
 
 /*
@@ -40,7 +40,7 @@ class Database{
 		try{
 			$this->_pdo = new PDO('mysql:host='.Config::get('mysql/host'). ';dbname='.Config::get('mysql/db'),Config::get('mysql/username'),Config::get('mysql/password'));
 			$this->_pdo->exec("set names utf8");
-			$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+			//$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 		}catch(PDOException $e){
 			echo "Connection error: " . $e->getMessage();
@@ -61,7 +61,7 @@ class Database{
 	* Get PDO
 	* @since 4.0.0
 */
-	public function PDO(){
+	public function PDO():object{
 		return $this->_pdo;
 	}
 
@@ -69,7 +69,7 @@ class Database{
 	* Get Instance of Database
 	* @since 4.0.0
 */
-	public static function getInstance(){
+	public static function getInstance():object{
 		if(!isset(self::$_instance)){
 			self::$_instance = new Database();
 		}
@@ -81,8 +81,8 @@ class Database{
 	* @Since 4.4.7
 	* @Param (String SQL, Array Fields)
 */
-	public function queryAPI($sql,$data = "" ,$column = ""){
-		$this->_error = false;	
+	public function queryAPI($sql,$data = "" ,$column = ""):object{
+		$this->_error = false;
 	
 		try{
 			if($this->_query = $this->_pdo->prepare($sql)){
@@ -122,7 +122,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String SQL, Array Fields)
 */
-	public function query($sql,$params = array()){
+	public function query($sql,$params = array()):object{
 		$this->_error = false;
 		
 		if($this->_query = $this->_pdo->prepare($sql)){
@@ -153,7 +153,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String)
 */
-	public function prepare($sql){
+	public function prepare($sql):void{
 		$this->_query = $this->_pdo->prepare($sql);
 	}
 
@@ -162,10 +162,10 @@ class Database{
 	* @Since 4.4.7
 	* @Param (Object,Array)
 */
-	public function bind($data,$columns){
+	public function bind($data,$columns):void{
 		for($x= 0;$x <count($columns);$x++){
-            if (isset($data->{$columns[$x]}->value)){ 
-				$bind = ":" .$columns[$x];
+            if (isset($data->{$columns[$x]}->value)){
+				$bind = ":" .str_replace('#','',$columns[$x]);
 				$value = htmlspecialchars(strip_tags($data->{$columns[$x]}->value));
 				$this->bindParam($bind,$value);
 			}
@@ -176,7 +176,7 @@ class Database{
 	* Column County
 	* @since 4.0.0
 */
-	public function columnCount(){
+	public function columnCount():int{
 		return $this->_columnCount;
 	}
 
@@ -184,7 +184,7 @@ class Database{
 	* Return Error Message
 	* @Since 4.4.7
 */	
-	public function errorMsg(){
+	public function errorMsg():object{
 		$errorMsg = new StdClass();
 		$errorMsg->message = (object) $this->_errormsg;
 		return $errorMsg ;
@@ -194,7 +194,7 @@ class Database{
 	* Get Column Name
 	* @since 4.0.0
 */	
-	public function columnName(){
+	public function columnName():array{
 		$meta = array();
 		foreach(range(0, $this->_columnCount - 1) as $column_index)
 		  $meta[] = $this->_query->getColumnMeta($column_index);
@@ -207,7 +207,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String SQL, Array Fields)
 */
-	public function execute(){
+	public function execute():void{
 		$this->_error = false;
 		if($this->_query->execute()){
 			$this->_results = $this->_query->fetchAll(PDO::FETCH_OBJ);
@@ -223,7 +223,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String SQL, Array Fields)
 */
-	public function bindParam($x,$param){
+	public function bindParam($x,$param):void{
 		$var_type = PDO::PARAM_STR;
 		switch (true) {
 			case is_bool($param):
@@ -245,8 +245,8 @@ class Database{
 	* @since 4.0.0
 	* @Param (String Action(Select/Delete,String Table,Array Where, Array Orders)
 */
-	private function action($action,$table,$where = array(),$orders = array()){
-
+	private function action($action,$table,$where = array(),$orders = array()):object|bool{
+		
 		if(count($where) == 3){
 			$operators = array('=','>','<','>=','<=');
 			$field 		= $where[0];
@@ -260,7 +260,7 @@ class Database{
 			if(in_array($operator,$operators)){
 				$sql="{$action} FROM {$table} WHERE {$field} {$operator} ? {$order}";
 				if(!$this->query($sql,array($value))->error())
-					return $this; 				
+					return $this;
 			}
 		}
 		else if(count($orders) == 2){
@@ -283,7 +283,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String Table, String Where, Array Orders)
 */
-	public function get($table,$where=array(),$order=array()){
+	public function get($table,$where=array(),$order=array()):object{
 		return $this->action('SELECT *',$table,$where,$order);
 	}
 
@@ -292,7 +292,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String Table)
 */	
-	public function all($table){
+	public function all($table):object{
 		$sql="SELECT * FROM {$table}";
 		if(!$this->query($sql)->error())
 			return $this;	
@@ -303,7 +303,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String Table, String Where)
 */
-	public function delete($table,$where){
+	public function delete($table,$where):object{
 		return $this->action('DELETE',$table,$where);
 	}
 
@@ -312,7 +312,7 @@ class Database{
 	* @since 4.0.0
 	* @Param (String Table, Array Fields)
 */
-	public function insert($table,$fields= array()){
+	public function insert($table,$fields= array()):bool{
 		if(count($fields)){
 			$keys = array_keys($fields);
 			$values = null;
@@ -338,9 +338,10 @@ class Database{
 	* @since 4.0.0
 	* @Param (String Table, String Where, Array Orders)
 */
-	public function update($table,$fields,$id,$byid = 'id'){
+	public function update($table,$fields,$id,$byid = 'id'):bool{
 		$set ='';
 		$x = 1;
+
 		foreach($fields as $name=>$value){
 			$set .= "`{$name}` = ?";
 			if($x < count($fields)){
@@ -349,6 +350,7 @@ class Database{
 			$x++;
 		}
 		$sql = "UPDATE {$table} SET {$set} WHERE {$byid} = '{$id}'";
+		echo $sql;
 		if(!$this->query($sql,$fields)->error()){
 			return true;
 		}
@@ -358,7 +360,7 @@ class Database{
 	* Database Get Results
 	* @since 4.0.0
 */	
-	public function results(){
+	public function results():mixed{
 		return $this->_results;
 	}
 
@@ -366,7 +368,7 @@ class Database{
 	* Database First Result
 	* @since 4.0.0
 */
-	public function first(){
+	public function first():object{
 		return $this->results()[0];
 	}
 
@@ -374,7 +376,7 @@ class Database{
 	* Database Error
 	* @since 4.0.0
 */	
-	public function error(){
+	public function error():bool{
 		return $this->_error;
 	}
 
@@ -382,7 +384,7 @@ class Database{
 	* Database Get Count
 	* @since 4.0.0
 */
-	public function count(){
+	public function count():int{
 		return $this->_count;
 	}
 	
@@ -390,7 +392,7 @@ class Database{
 	* Database Get Last Inserted Record
 	* @since 4.0.0
 */	
-	public function last(){
+	public function last():int{
 		return $this->_lastinsert;
 	}
 	
@@ -398,7 +400,7 @@ class Database{
 	* Database Close
 	* @since 4.0.2
 */	
-	public function close(){
+	public function close():void{
 		$this->_pdo = null;
 		$this->_query = null;
 	}

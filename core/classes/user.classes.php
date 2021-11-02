@@ -20,11 +20,12 @@ class User
 */
 	private $_db,
 		$_data,
-		$_sessionName,
 		$_isLoggedIn,
 		$_permissions,
 		$_useritem,
-		$_usersettings;
+		$_usersettings,
+		$_sessionName,
+		$_sessionTimeout;
 
 	/*
 	* Construct User
@@ -33,17 +34,32 @@ class User
 */
 	public function __construct(mixed $user = null)
 	{
-
 		$this->_db = Database::getInstance();
-		$this->_sessionName = Config::get('session/session_name');
-		if (!$user) {
-			if (Session::exists($this->_sessionName)) {
-				$user = Session::get($this->_sessionName);
-				if ($this->find($user))
-					$this->_isLoggedIn = true;
-			}
+		$this->_sessionName = Config::get('remember/cookie_name');
+		$this->_sessionTimeout = Config::get('remember/cookie_expiry');
+		if (Session::exists($this->_sessionName)) {
+			$userParam = Session::get($this->_sessionName);
+
+			$item =  self::argsParam($userParam);
+
+			if ($this->find($item->id))
+				$this->_isLoggedIn = true;
 		} else
 			$this->find($user);
+	}
+
+	public static function argsParam($string, $explodeby = "&", $explodebyinner = "="): object
+	{
+		$string = explode($explodeby, $string);
+		$array = array('uid' => '', 'un' => '', 'id' => '');
+		if (count($string) > 0) {
+			foreach ($string as $key) {
+				$value = explode($explodebyinner, $key);
+				if (count($value) > 1)
+					$array[$value[0]] = $value[1];
+			}
+		}
+		return (object)$array;
 	}
 
 	/*
@@ -81,37 +97,50 @@ class User
 	* @since 4.0.0
 	* @Param (String Username, String Password, Boolean Remember)
 */
-	public function login(mixed $username = null,string $password = null,bool $remember = false): bool
+	public function login(mixed $username = null, string $password = null, bool $remember = false): bool
 	{
-		if (!$username && !$password && $this->exists())
-			Session::put($this->_sessionName, $this->data()->id);
-		else {
-			$user = $this->find($username);
+		$hash = Hash::generateRandomString(35);
+		$user = $this->find($username);
 
-			if ($user) {
+		if ($user) {
 
-				if ($this->data()->password === Hash::make($password)) {
-					Session::put($this->_sessionName, $this->data()->id);
+			if ($this->data()->password === Hash::make($password)) {
+				$this->_remember = $remember;
+				if ($remember) {
 
-					if ($remember) {
-						$hash = Hash::generateRandomString(35);
-						$hashCheck = $this->_db->get('user_session', array('user_id', '=', $this->data()->salt));
+					$hashCheck = $this->_db->get('users_session', array('user_id', '=', $this->data()->id));
 
-						if (!$hashCheck->count())
-							$this->_db->insert('users_session', array('user_id' => $this->data()->id, 'hash' => $hash));
-						else
-							$hash = $hashCheck->first()->hash;
-
-						Cookie::put($this->_cookieName, $hash, Config::get('remember/cookie_expiry'));
-					}
-
-					return true;
+					if (!$hashCheck->count())
+						$this->_db->insert('users_session', array('user_id' => $this->data()->id, 'session' => $hash));
+					else
+						$hash = $hashCheck->first()->session;
 				}
+				$this->setRemeberMe($username, $this->data()->id, $hash, $remember);
+				return true;
 			}
 		}
+
 		return false;
 	}
+	public function setRemeberMe($username, $userid, $hash, $remember = false): void
+	{
+		$cookieStr = "un=" . $username;
+		$cookieStr .= "&uid=" . $hash;
+		$cookieStr .= "&id=" . $userid;
+		$cookieExpire = 0;
+		if ($remember)
+			$cookieExpire = $this->_sessionTimeout;
 
+		Session::put(
+			$this->_sessionName,
+			$cookieStr
+		);
+		Cookie::put(
+			$this->_sessionName,
+			$cookieStr,
+			$cookieExpire
+		);
+	}
 	/*
 	* User Has Permission
 	* @since 4.0.0
@@ -121,8 +150,8 @@ class User
 	{
 		if (!is_null($this->_permissions)) {
 			if (strlen(cast::_string($this->_permissions)) > 0) {
-				$permission = json_decode($this->_permissions, true);
-				
+				$permission = json::decode($this->_permissions, true);
+
 				if (filter::bool(cast::_string($permission[$key])))
 					return true;
 			}
@@ -138,7 +167,7 @@ class User
 	public function hasUserItem(string $key): string
 	{
 		if (strlen($this->_useritem) > 0) {
-			$permission = json_decode($this->_useritem, true);
+			$permission = json::decode($this->_useritem, true);
 			return $permission[$key];
 		}
 		return '';
@@ -152,11 +181,12 @@ class User
 	public function hasUserSettings(string $key): string
 	{
 		if (strlen($this->_usersettings) > 0) {
-			$permission = json_decode($this->_usersettings, true);
+			$permission = json::decode($this->_usersettings, true);
 			return $permission[$key];
 		}
 		return '';
 	}
+
 	/*
 	* User Exists
 	* @since 4.0.0
@@ -172,48 +202,46 @@ class User
 	* @since 4.0.0
 	* @Param ()
 */
-	public function logout(): void
+	public function logout(int $id): void
 	{
-		@$this->_db->delete('users_session', array('user_id', '=', $this->data()->id));
+		$this->_db->delete('users_session', array('user_id', '=', $id));
 		$this->_isLoggedIn = false;
-		$this->_data = '';
-		$this->_permissions = '';
-		SESSION::delete($this->_sessionName);
-		@Cookie::delete($this->_cookieName);
+		$this->_data = $this->_permissions = '';
+
+		if (Session::exists($this->_sessionName))
+			Session::delete($this->_sessionName);
+
+		if (Cookie::exists($this->_sessionName))
+			Cookie::delete($this->_sessionName);
 	}
 
 
 	/*
 	* Password Check
-	* @since 4.0.0	
+	* @since 4.0.0
 	* @param (String Password,Int Length)
 */
-	public function password_check(string $password,int $min_length = 4): int
+	public function password_check(string $password, int $min_length = 4): int
 	{
 		$password = preg_replace('/\s+/', ' ', $password);
 		$strength = 0;
 		if (strlen($password) >= $min_length) {
 			if (preg_match_all('/[~!@#\$%\^&\*\(\)\-_=+\|\/;:,\.\?\[\]\{\}]/', $password, $match)) {
 				$strength = 4;
-				if (count($match[0]) > 1) {
+				if (count($match[0]) > 1)
 					++$strength;
-				}
 			} else {
-				if (preg_match('/[A-Z]+/', $password)) {
+				if (preg_match('/[A-Z]+/', $password))
 					++$strength;
-				}
-				if (preg_match('/[a-z]+/', $password)) {
+				if (preg_match('/[a-z]+/', $password))
 					++$strength;
-				}
-				if (preg_match('/[0-9]+/', $password)) {
+				if (preg_match('/[0-9]+/', $password))
 					++$strength;
-				}
 			}
 			if (preg_match_all('/[^0-9a-z~!@#\$%\^&\*\(\)\-_=+\|\/;:,\.\?\[\]\{\}]/i', $password, $match)) {
 				++$strength;
-				if (count($match[0]) > 1) {
+				if (count($match[0]) > 1)
 					++$strength;
-				}
 			}
 		}
 		return $strength;
@@ -224,7 +252,7 @@ class User
 	* @since 4.0.0	
 	* @param (Int Length,Int Strength)
 */
-	public function password_generate(int $length = 10,int $strength = 5): string
+	public function password_generate(int $length = 10, int $strength = 5): string
 	{
 		static $special = [
 			'~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
@@ -297,5 +325,18 @@ class User
 	public function isLoggedIn(): bool
 	{
 		return cast::_bool($this->_isLoggedIn);
+	}
+
+	public function isTimedOut(): bool
+	{
+
+		$cookie = Cookie::exists($this->_sessionName);
+		if (!$cookie) {
+			//Cookie::delete($this->_sessionName);
+			//Session::delete($this->_sessionName);
+			return true;
+		}
+
+		return false;
 	}
 }

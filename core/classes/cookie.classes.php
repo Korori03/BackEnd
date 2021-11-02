@@ -23,7 +23,7 @@ class Cookie{
 
 /*
 	* Cookie Get Cookie
-	* @since 4.0.0	
+	* @since 4.0.0
 	* @Param (String Name)
 */
 	public static function get(string $name):string{
@@ -36,8 +36,14 @@ class Cookie{
 	* @Param (String Name, String Value, String Expiring Time)
 */	
 	public static function put(string $name,$value,$expiry):bool{
-		if(setcookie($name,$value,time() + $expiry,'/'))
+		$domainName = $_SERVER['SERVER_NAME'];
+		if (!$domainName) {
+			$domainName = $_SERVER['HTTP_HOST'];
+		}
+
+		if(setcookie($name,$value,time() + $expiry,'/', $domainName))
 			return true;
+
 		return false;
 	}
 

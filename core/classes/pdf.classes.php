@@ -35,7 +35,7 @@ class pdf
     public function AddPage($html):void
     {
         $this->_html .= $html;
-        if($this->_pages > $this->_setpages)
+        if($this->_pages < $this->_setpages)
             $this->_html .= '<div style="page-break-before: always;"></div>';
 
         $this->_pages++;

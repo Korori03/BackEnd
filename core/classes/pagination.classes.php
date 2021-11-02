@@ -7,7 +7,7 @@
 	* Developed by: Ami (亜美) Denault
 */
 declare(strict_types=1);
-class Pagination {		
+class Pagination {
 		
 	public	$itemsPerPage,
 			$range,

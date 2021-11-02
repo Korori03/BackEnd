@@ -65,7 +65,7 @@ spl_autoload_register(function($class_name){
 	$GLOBALS['options'] = array();
 	foreach($dboptions->results() as $option){
 		
-		if($option->autoload =='yes'){
+		if(str::_strtolower(substr($option->autoload,0,1)) =='y'){
 			$option_name = $option->option_name;
 			$option_value = $option->option_value;
 			$GLOBALS['options'][$option_name] = $option_value;
@@ -79,25 +79,13 @@ spl_autoload_register(function($class_name){
 	* @ Since 4.0.2
 */
 $modules = array(
-	'dompdf'=>'autoload.inc.php'
+	//'dompdf'=>'autoload.inc.php',
+	//'phpmailer'=>'autoload.inc.php'
 );
 foreach($modules as $module=>$loader)
 {
 	if(file_exists("core/modules/{$module}/{$loader}"))
 		require_once("core/modules/{$module}/{$loader}");
-}
-/*
-	* Get Cookie Instances for Remember Me
-	* @ Version 1.0.3
-	* @ Since 4.0.0
-*/	
-if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Session::get('session/session_name'))){
-	$hash = Cookie::get(Config::get('remember/cookie_name'));
-	$hashCheck = DataBase::getInstance()->get('users_session',array('hash','=',$hash));
-	if($hashCheck->count()){
-		$user = new User($hashCheck->first()->user_id);
-		$user->login();
-	}
 }
 
 /*

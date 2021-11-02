@@ -15,7 +15,7 @@ class Grabber{
 	* @Since 1.1.4
 	* @Param (Url String)
 */
-	public static function fromURL(string $url):string|void{
+	public static function fromURL(string $url):string{
 		$curl = curl_init();		
 		$userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)'; 
 

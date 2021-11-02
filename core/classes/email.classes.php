@@ -11,23 +11,32 @@
 	* @Since 4.0.0
 */
 declare(strict_types=1);
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class Email {
 	
 /*
 	* Variables
 	* @Since 4.1.0
 */		
-	public 	$_Sender 		= 	'',
-			$_to 			= 	array(),
+	public 	$_to 			= 	array(),
 			$_to_name 		= 	array(),
 			$_Subject 		=	'',
 			$_Message		=	'',
 			$_eol 			= 	PHP_EOL,
 			$_Send_to 		=	'',
 			$_Content_Type 	= 	'html',
+			$_Host 			= 	'smtp.gmail.com',
+			$_SMTPAuth 		= 	true,
+			$_Port 			= 	587,
+			$_isHTML 		= 	true,
 			$_ErrorInfo 	= 	'',
 			$_ErrorBool 	= 	false,
-			$attachment     = array();
+			$attachment     = array(),
+			$_mailer		=	'';
 
 /*
 	* Construct Function
@@ -35,8 +44,23 @@ class Email {
 	* @Param (String)
 */
 	public function __construct() {
-		$this->_Sender = Config::get('emailer/sender/name') . ' <'.Config::get('emailer/sender/email') . '>';
+		$this->_mailer = new PHPMailer(true);
+		$this->_mailer->isSMTP();
+		$this->_mailer->Host =	$this->_Host;
+		$this->_mailer->SMTPAuth = $this->_SMTPAuth;
+		$this->_mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+		$this->_mailer->Port = $this->_Port;
+		$this->_mailer->IsHTML($this->_isHTML);
+
+		$this->_mailer->Username   = Config::get('emailer/sender/email');
+		$this->_mailer->From   = Config::get('emailer/sender/email');
+		$this->_mailer->Password   = Config::get('emailer/sender/password');
+
+
 		$this->_to = $this->attachment = $this->_to_name = array();
+
+
+
 		$this->_ErrorBool = false;
 		$this->_ErrorInfo = $this->_Subject = $this->_Message = $this->_Send_to = '';
 	}
@@ -47,73 +71,35 @@ class Email {
 	* @Param (None)
 */
 	public function send(){
-		$separator = md5(date::_human(NULL));
-
-		//Header
-        $headers = "MIME-Version: 1.0".$this->_eol;
-        $headers .= "From:".$this->_Sender.$this->_eol;
-        $headers .= "Content-Type: multipart/mixed; boundary = $separator".$this->_eol .$this->_eol;
-
-        //Text
-        $body = "--$separator".$this->_eol;
-        $body .= "Content-Type: text/". $this->_Content_Type ."; charset=ISO-8859-1".$this->_eol;
-        $body .= "Content-Transfer-Encoding: base64" .$this->_eol;
-        $body .= chunk_split(base64_encode($this->_Message));
-
-		//Loop through Attachments
-		for($x=0;$x < count($this->attachment);$x++){
-			 //if(is_file($this->attachment[$x][0]) && filesystem::_exist($this->attachment[$x][0])) {
-				$filename = $this->attachment[$x][1];
-				$path = $this->attachment[$x][0];
-				$type = $this->attachment[$x][2];
-
-				$file = fopen($path,'rb');
-				$data = fread($file,filesize($path));
-				fclose($file);
- 				$attachment = chunk_split(base64_encode($data));
-
-				$body .= "--$separator".$this->_eol;
-				$body.= sprintf("--%s%s", $separator, $this->_eol);
-				$body.= sprintf("Content-Type: %s; name=\"%s\"%s", $type, $filename, $this->_eol);
-				$body.= "Content-Transfer-Encoding: base64" . $this->_eol;
-				$body.= "Content-Disposition: attachment" .$this->_eol;
-				$body.= $attachment;
-				$body .= $this->_eol.$this->_eol;
-				$body.= sprintf("--%s--", $separator);
-
-
-			// }
-			// else{
-			//	$this->_ErrorInfo .='Unable to find: ';
-			//	return false;
-			// }
-		}
-		
-		//Loop through Senders
-		if(count($this->_to) > 0){
-			for($x=0;$x < count($this->_to);$x++){
-				
-				if(count($this->_to) > $x + 1)
-					$this->_Send_to .= $this->_to_name[$x] . " <" . $this->_to[$x] . ">,";
-				else
-					$this->_Send_to .= $this->_to_name[$x] . " <" . $this->_to[$x] . ">";
+		try {
+			//Loop through Attachments
+			for($x=0;$x < count($this->attachment);$x++){
+				$this->_mailer->AddAttachment(
+					$this->attachment[$x][0],
+					$this->attachment[$x][1]
+				);
 			}
-		}
 
-		//Attempt to Email
-		if(!(bool)$this->_ErrorBool){
+			//Loop through Senders
+			if(count($this->_to) > 0){
+				for($x=0;$x < count($this->_to);$x++){
+						$this->_mailer->addAddress($this->_to[$x], $this->_to_name[$x]);
+				}
+			}
 
-			$this->_ErrorBool = false;
+			//Attempt to Email
+			if(!(bool)$this->_ErrorBool){
 
-			if (mail($this->_Send_to, $this->_Subject, $body, $headers))
+				$this->_ErrorBool = false;
+
+				$this->_mailer->Subject = $this->_Subject;
+				$this->_mailer->Body = $this->_Message;
+				$this->_mailer->AltBody = 'Plain text message body for non-HTML email client. Gmail SMTP email body.';
+				$this->_mailer->send();
 				return true;
-			else{
-				$this->_ErrorInfo .= error_get_last()?error_get_last()['message']:'Unknown';
-				return false;
 			}
-		}
-		else{
-			$this->_ErrorInfo .= error_get_last()['message'];
+		} catch (Exception $e) {
+			$this->_ErrorInfo .= $this->_mailer->ErrorInfo;
 			$this->_ErrorBool = false;
 			return false;
 		}
