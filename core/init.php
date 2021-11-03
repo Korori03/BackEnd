@@ -61,6 +61,7 @@ spl_autoload_register(function($class_name){
 	* @ Version 1.0.0
 	* @ Since 4.0.1
 */
+if(Config::get('mysql/use')){
 	$dboptions = Database::getInstance()->get(Config::get('table/options'));
 	$GLOBALS['options'] = array();
 	foreach($dboptions->results() as $option){
@@ -72,6 +73,11 @@ spl_autoload_register(function($class_name){
 		}
 	
 	}
+}
+else{
+	$GLOBALS['options']['timezone'] = Config::get('options/timezone');
+	$GLOBALS['options']['template'] = Config::get('options/template');
+}
 
 	/*
 	* Module Loader

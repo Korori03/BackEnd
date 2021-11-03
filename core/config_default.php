@@ -5,7 +5,12 @@ $GLOBALS['config']=array(
 		'host'=>'host',
 		'username'=>'username',
 		'password'=>'password',
-		'db'=>'Database'
+		'db'=>'Database',
+		'use'=>false
+	),
+	'options'=>	array(
+		'timezone' => 'America/Chicago',
+		'template' => 'smooth'
 	),
 	'api'=>array(
 		'key'=>'50 char hash here',
