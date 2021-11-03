@@ -15,12 +15,12 @@ class Grabber{
 	* @Since 1.1.4
 	* @Param (Url String)
 */
-	public static function fromURL(string $url):string{
+	public static function fromURL(string $url):string|bool{
 		$curl = curl_init();		
 		$userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)'; 
 
 		curl_setopt($curl,CURLOPT_URL,$url); 
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,TRUE); 
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,TRUE);
 		curl_setopt($curl,CURLOPT_CONNECTTIMEOUT,5); 
 
 		curl_setopt($curl, CURLOPT_USERAGENT, $userAgent); 

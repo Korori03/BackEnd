@@ -23,7 +23,7 @@ class Config{
 	public static function get(string $path=null){
 		if($path){
 			$config = $GLOBALS['config'];
-			$path =explode('/',$path);
+			$path = explode('/',$path);
 			
 			foreach($path as $bit){
 				if(isset($config[$bit]))

@@ -22,8 +22,6 @@ class User
 		$_data,
 		$_isLoggedIn,
 		$_permissions,
-		$_useritem,
-		$_usersettings,
 		$_sessionName,
 		$_sessionTimeout;
 
@@ -159,33 +157,6 @@ class User
 		return false;
 	}
 
-	/*
-	* User Has Item
-	* @since 4.0.1
-	* @Param (String Key)
-*/
-	public function hasUserItem(string $key): string
-	{
-		if (strlen($this->_useritem) > 0) {
-			$permission = json::decode($this->_useritem, true);
-			return $permission[$key];
-		}
-		return '';
-	}
-
-	/*
-	* User Settings
-	* @since 4.0.1
-	* @Param (String Key)
-*/
-	public function hasUserSettings(string $key): string
-	{
-		if (strlen($this->_usersettings) > 0) {
-			$permission = json::decode($this->_usersettings, true);
-			return $permission[$key];
-		}
-		return '';
-	}
 
 	/*
 	* User Exists

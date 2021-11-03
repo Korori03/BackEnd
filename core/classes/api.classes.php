@@ -47,7 +47,7 @@ class Api
 */
 	public static function checkSession(string $ip, string $session): bool
 	{
-		$sql = sprintf("SELECT id FROM " . Config::get('table/users') . " WHERE ip = %s and session =%s LIMIT 1;", $ip, $session);
+		$sql = sprintf("SELECT id FROM " . Config::get('table/users') . " WHERE ip = %s and session = %s LIMIT 1;", $ip, $session);
 		$check = Database::getInstance()->query($sql);
 		return ($check->count() > 0 ? true : false);
 	}
@@ -196,7 +196,7 @@ class Api
 				$products_arr["object"]		= (object)["message" => "Login Session Created Successfully"];
 				$products_arr["session"]	=  self::_SetSessionID($username, $password);
 
-				$sql = sprintf("Update " . Config::get('table/users') . " SET `ip` = '%s', `session` = '%s' WHERE `username` ='%s';",self::_GetIP(),$products_arr["session"],$username);
+				$sql = sprintf("Update " . Config::get('table/users') . " SET `ip` = '%s', `session` = '%s' WHERE `username` ='%s';", self::_GetIP(), $products_arr["session"], $username);
 
 				Database::getInstance()->query($sql);
 				self::$_SessionApi = $products_arr["session"];
@@ -306,7 +306,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Array,Object,String)
 */
-	public static function APISetup(mixed $columns,mixed $data, string $type = 'where'): array
+	public static function APISetup(mixed $columns, mixed $data, string $type = 'where'): array
 	{
 
 		$update = array();
@@ -341,7 +341,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Object,Array,String)
 */
-	public static function submit(mixed $data,mixed $columns,mixed $query): array
+	public static function submit(mixed $data, mixed $columns, mixed $query): array
 	{
 		$stmt = Database::getInstance()->queryAPI($query, $data->data, $columns);
 		$object = new stdClass();

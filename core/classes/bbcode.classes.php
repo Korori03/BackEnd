@@ -22,7 +22,6 @@ class BBCODE{
 	public static function format(string $text): string{
 	
 		$text = html_entity_decode ($text,ENT_QUOTES,'UTF-8');				
-	    
 		$text = str::_toAscii($text);
 		$bbcodes = array(
 			'/\[br\]/is' => '<br/>',
@@ -329,4 +328,3 @@ class BBCODE{
 			return '<div style="color:red;margin-left:auto;margin-right:auto;">Video cannot be found!!!</div>';
 		}
 	}
-?>

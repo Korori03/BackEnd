@@ -23,7 +23,7 @@ class Cookie{
 
 /*
 	* Cookie Get Cookie
-	* @since 4.0.0
+	* @since 4.0.0	
 	* @Param (String Name)
 */
 	public static function get(string $name):string{
@@ -43,7 +43,6 @@ class Cookie{
 
 		if(setcookie($name,$value,time() + $expiry,'/', $domainName))
 			return true;
-
 		return false;
 	}
 

@@ -18,7 +18,7 @@ class arr
 	* @Since 4.0.0
 	* @Param (Array, String, String)
 */
-	public static function _sort(array $array,string $on,int $order = SORT_ASC): array
+	public static function _sort(array $array, string $on, int $order = SORT_ASC): array
 	{
 		$new_array = array();
 		$sortable_array = array();
@@ -75,7 +75,7 @@ class arr
 	* @Since 4.0.0
 	* @Param (Array Object,String Key, Bool Sorting)
 */
-	public static function _sksort(array &$array,string $subkey = "id",bool $sort_ascending = false): array
+	public static function _sksort(array &$array, string $subkey = "id", bool $sort_ascending = false): array
 	{
 
 		$temp_array = array();
@@ -106,12 +106,12 @@ class arr
 		return $array;
 	}
 
-/*
+	/*
 	* Array Replace
 	* @Since 4.0.0
 	* @Param (Array Object,Array Object, String)
 */
-	public static function _replace(array $ary1,array $ary2,string $string): string
+	public static function _replace(array $ary1, array $ary2, string $string): string
 	{
 
 		if (count($ary1) !== count($ary2))
@@ -123,7 +123,7 @@ class arr
 		return $string;
 	}
 
-/*
+	/*
 	* Get Last Item in Array
 	* @Since 4.1.5
 	* @Param (Array Object)
@@ -133,7 +133,7 @@ class arr
 		return $array[array_keys($array)[sizeof($array) - 1]];
 	}
 
-/*
+	/*
 	* Get First Item in Array
 	* @Since 4.1.5
 	* @Param (Array Object)
@@ -143,7 +143,7 @@ class arr
 		return $array[array_keys($array)[0]];
 	}
 
-/*
+	/*
 	* Make Sure Array has Unique
 	* @Since 4.1.5
 	* @Param (Array Object,Bool Keys)
@@ -159,7 +159,7 @@ class arr
 		return $array;
 	}
 
-/*
+	/*
 	* Find Item with Key Value
 	* @Since 4.1.5
 	* @Param (String Key,Array Array,Bool ReturnValue)
@@ -178,7 +178,7 @@ class arr
 		return $isExists;
 	}
 
-/*
+	/*
 	* First Key in Array
 	* @Since 4.1.5
 	* @Param (Array Array)
@@ -188,7 +188,7 @@ class arr
 		return key(self::_first($array));
 	}
 
-/*
+	/*
 	* Last Key in Array
 	* @Since 4.1.5
 	* @Param (Array Array)
@@ -198,7 +198,7 @@ class arr
 		return key(self::_last($array));
 	}
 
-/*
+	/*
 	* Searc Array with Keys
 	* @Since 4.1.5
 	* @Param (Array Array,String Search,?String Field)
@@ -219,23 +219,20 @@ class arr
 
 				if (is_scalar($element) && $element === $search)
 					return $key;
-
 			} elseif (is_object($element)) {
 				$element = (array)$element;
 				if (in_array($search, $element, false))
 					return $key;
-
 			} elseif (is_array($element) && in_array($search, $element, false))
 				return $key;
-			 elseif (is_scalar($element) && $element === $search)
+			elseif (is_scalar($element) && $element === $search)
 				return $key;
-
 		}
 
 		return 'Unable to Find';
 	}
 
-/*
+	/*
 	* Group By Key
 	* @Since 4.1.5
 	* @Param (Array Array,String Key)
@@ -257,7 +254,7 @@ class arr
 		return $result;
 	}
 
-/*
+	/*
 	* Is Associate Array
 	* @Since 4.1.5
 	* @Param (Array Array)
@@ -268,7 +265,7 @@ class arr
 		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 
-/*
+	/*
 	* Find in Array
 	* @Since 4.1.5
 	* @Param (String Value,Array Array,Bool ReturnKey)
@@ -278,7 +275,7 @@ class arr
 		$inArray = in_array($value, $array, true);
 
 		if ($returnKey) {
-			if ($inArray) 
+			if ($inArray)
 				return array_search($value, $array, true);
 
 			return '';

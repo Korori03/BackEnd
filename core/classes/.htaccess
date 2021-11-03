@@ -5,4 +5,4 @@
 <files "imageverification.classes.php">
 	Allow from allow
 </files>
-ErrorDocument 403 http://houstoncounty.org/
+ErrorDocument 403 https://houstoncounty.org/
