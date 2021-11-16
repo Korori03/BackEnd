@@ -144,7 +144,7 @@ class Forum
             $topic_div_list->setArray(array(
                 'topic_id'  =>  '',
                 'topic_cat' =>  '',
-                'title'     => 'You do Not have permission to access this Topic',
+                'title'     => 'You do Not have permission to access this Topic',,
                 'date'      =>  '',
                 'postedby'  =>  ''
             ));
@@ -233,7 +233,7 @@ class Forum
         } else {
             $post_div_list->setArray(array(
                 'post_id'           =>  '',
-                'post_content'      =>   'You do Not have permission to access this Post',
+                'post_content'      =>   'You do Not have permission to access this Post',,
                 'post_topic'        =>  '',
                 'postedby'          =>  '',
                 'username'          =>  ''

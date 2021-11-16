@@ -29,7 +29,7 @@ class Email {
 			$_eol 			= 	PHP_EOL,
 			$_Send_to 		=	'',
 			$_Content_Type 	= 	'html',
-			$_Host 			= 	'smtp.gmail.com',
+			$_Host 			= 	'smtp.sendgrid.net',
 			$_SMTPAuth 		= 	true,
 			$_Port 			= 	587,
 			$_isHTML 		= 	true,
@@ -48,11 +48,11 @@ class Email {
 		$this->_mailer->isSMTP();
 		$this->_mailer->Host =	$this->_Host;
 		$this->_mailer->SMTPAuth = $this->_SMTPAuth;
-		$this->_mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+		$this->_mailer->SMTPSecure = 'tls';
 		$this->_mailer->Port = $this->_Port;
 		$this->_mailer->IsHTML($this->_isHTML);
 
-		$this->_mailer->Username   = Config::get('emailer/sender/email');
+		$this->_mailer->Username   = Config::get('emailer/sender/username');
 		$this->_mailer->From   = Config::get('emailer/sender/email');
 		$this->_mailer->Password   = Config::get('emailer/sender/password');
 

@@ -92,7 +92,7 @@ class Calendar{
 		$first_of_month = gmmktime(0,0,0,$month,1,$year);
 		$first_day = 0;
 
-		list($month, $year, $weekday) = explode(',',gmstrftime('%m,%Y,%w',$first_of_month));
+		list($month, $year, $month_name, $weekday) = explode(',',gmstrftime('%m,%Y,%B,%w',$first_of_month));
 	
 		$weekday = ($weekday + 7 - $first_day) % 7;
 		

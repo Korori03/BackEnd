@@ -34,7 +34,7 @@ class Redirect
 
 		if ($location) {
 			if (is_numeric($location)) {
-				if (filesystem::_exist($_error_pages[$location])) {
+				if (file::_exist($_error_pages[$location])) {
 					switch ($location) {
 						case 404:
 							header('HTTP/1.0 404 Not Found');
@@ -99,7 +99,7 @@ class Redirect
 				default:
 					header('Content-Description: File Transfer');
 					$fsize = filesize($location);
-					$ext = filesystem::_extension($location);
+					$ext = file::_extension($location);
 					header('Content-Description: File Transfer');
 					header("Pragma: public");
 					header("Expires: 0");

@@ -25,6 +25,7 @@ class Date
         if ($time instanceof DateTime)
             return $time->setTimezone($timeZone);
 
+
         $dateTime = new DateTime('@' . self::_toTimeStamp($time));
         $dateTime->setTimezone($timeZone);
 

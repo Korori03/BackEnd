@@ -7,10 +7,9 @@
 	* Developed by: Ami (亜美) Denault
 */
 declare(strict_types=1);
-class Pagination {		
+class Pagination {
 		
 	public	$itemsPerPage,
-			$range,
 			$currentPage,
 			$total,
 			$textNav,
@@ -24,9 +23,8 @@ class Pagination {
 	{
 		
 		$this->itemsPerPage = 5;
-		$this->currentPage  = 1;		
+		$this->currentPage  = 1;
 		$this->total		= 0;
-		$this->range        = 5;
 		$this->get_type 	= 'page';
 		
 		
@@ -36,7 +34,6 @@ class Pagination {
 		);			
 		$this->_link 	  	= filter_var($_SERVER['PHP_SELF'], FILTER_SANITIZE_STRING);
 		$this->_itemHtml  	= '';
-		
 	}
        
 	public function generate()
@@ -45,10 +42,24 @@ class Pagination {
 		return $this->_itemHtml;
 	}
 
-	
+	public function setTotal(int $total){
+		$this->total		= $total;
+	}
+	public function setCurrent(int $current){
+		$this->currentPage		= $current;
+	}
+
+	public function setPerPage(int $itemsPerPage){
+		$this->itemsPerPage		= $itemsPerPage;
+	}
+
+	public function setLinkText(string $linkText){
+		$this->_link		= $linkText;
+	}
+
 	private function  _getHTMLData()
 	{
-		
+
 		$layout = new Template("_pagination.tpl");
 		$list_item = new Template("_pagination_item.tpl");
 		$list ='';
@@ -56,9 +67,9 @@ class Pagination {
 			$list_item->setArray(array('active'=>'','link'=>$this->_link .'/'.($this->currentPage-1).'-' .$this->get_type,'name'=>$this->_navigation['pre']));
 			$list .= $list_item->show();
 		}
-		if($this->total > $this->range){
-			$start = ($this->currentPage <= $this->range)?1:($this->currentPage - $this->range);
-			$end   = (ceil($this->total/$this->itemsPerPage) - $this->currentPage >= $this->range)?($this->currentPage+$this->range): (ceil($this->total/$this->itemsPerPage));
+		if($this->total > $this->itemsPerPage){
+			$start = ($this->currentPage <= $this->itemsPerPage)?1:($this->currentPage - $this->itemsPerPage);
+			$end   = (ceil($this->total/$this->itemsPerPage) - $this->currentPage >= $this->itemsPerPage)?($this->currentPage+$this->itemsPerPage): (ceil($this->total/$this->itemsPerPage));
 		}else{
 			$start = 1;
 			$end   = ceil($this->total/$this->itemsPerPage);
@@ -74,8 +85,8 @@ class Pagination {
 			$list_item->setArray(array('active'=>'','link'=>$this->_link .'/'.($this->currentPage+1).'-' .$this->get_type,'name'=>$this->_navigation['next']));
 			$list .= $list_item->show();
 		}
+
 		$layout->setArray(array('list'=>$list));
 		return $layout->show();
 	}
 }
-?>

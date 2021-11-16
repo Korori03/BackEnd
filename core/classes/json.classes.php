@@ -105,7 +105,7 @@ class Json {
 */
 	public static function returnJson(bool $status,$data):string{
 		$response = array(
-			'status' 	=> $status?'true':'false',
+			'status' 	=> cast::_string($status),
 			'message' 	=> $data
 		);
 

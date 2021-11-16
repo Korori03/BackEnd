@@ -40,7 +40,7 @@ class Csv {
 			
 		if(!$delimiter)
 			$delimiter = ',';
-
+			
 		if(!$table)
 			$table = preg_replace("/[^A-Z0-9]/i", '', basename($csv_path));
 		
@@ -49,7 +49,7 @@ class Csv {
 				return str::_strtolower(preg_replace("/[^A-Z0-9]/i", '', $field));
 			}, fgetcsv($csv_handle, 0, $delimiter));
 		}
-
+		
 		$create_fields_str = join(', ', array_map(function ($field){
 			return "$field TEXT NULL";
 		}, $fields));

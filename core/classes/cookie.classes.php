@@ -36,12 +36,7 @@ class Cookie{
 	* @Param (String Name, String Value, String Expiring Time)
 */	
 	public static function put(string $name,$value,$expiry):bool{
-		$domainName = $_SERVER['SERVER_NAME'];
-		if (!$domainName) {
-			$domainName = $_SERVER['HTTP_HOST'];
-		}
-
-		if(setcookie($name,$value,time() + $expiry,'/', $domainName))
+		if(setcookie($name,$value,time() + $expiry,'/'))
 			return true;
 		return false;
 	}
