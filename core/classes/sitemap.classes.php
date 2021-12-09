@@ -95,8 +95,7 @@ class Sitemap
     }
 
     public function builder(){
-        $this->enableCompression();
-        $this->setMaxUrlsPerSitemap(50000);
+       $this->setMaxUrlsPerSitemap(50000);
         $this->setSitemapFileName($this->sitemapFileName);
         $this->setsitemapXMLFileName($this->sitemapXMLFileName);
         $this->scanPages();

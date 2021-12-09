@@ -89,15 +89,15 @@ class Calendar{
 		
 		$calendar ='';
 		$event_list = array();
-		$first_of_month = gmmktime(0,0,0,$month,1,$year);
+		$first_of_month = $month .'-01-'.$year;
 		$first_day = 0;
 
-		list($month, $year, $month_name, $weekday) = explode(',',gmstrftime('%m,%Y,%B,%w',$first_of_month));
+		list($month, $year, $weekday) = explode(',',date::_custom($first_of_month,'m,Y,w'));
 	
 		$weekday = ($weekday + 7 - $first_day) % 7;
 		
 
-		for($day = 1,$days_in_month=gmdate('t',$first_of_month);$day<=$days_in_month; $day++,$weekday++){
+		for($day = 1,$days_in_month=date::_custom($first_of_month,'t');$day<=$days_in_month; $day++,$weekday++){
 			
 			if($weekday == 7){
 				$weekday   = 0; 

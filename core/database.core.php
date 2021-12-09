@@ -350,7 +350,6 @@ class Database{
 			$x++;
 		}
 		$sql = "UPDATE {$table} SET {$set} WHERE {$byid} = '{$id}'";
-		echo $sql;
 		if(!$this->query($sql,$fields)->error()){
 			return true;
 		}

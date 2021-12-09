@@ -59,15 +59,19 @@ class pdf
     {
         $mail = new Email();
         $mail->Content_Type('html');
-        $mail->setFrom('reminder@houstoncounty.org', 'Emailer');
+        $mail->setFrom('noreply@houstoncountyal.gov', 'Emailer');
+
         foreach(explode(',',$options['email']) as $email){
             $mail->addAddress($email);
         }
 
-
         $mail->Subject($options['subject']);
         $mail->AddAttachment($this->_path,$options['filename'],'application/pdf');
         $mail->Body($options['message']);
-        return  $mail->send();
+
+
+
+
+        $mail->send();
     }
 }
