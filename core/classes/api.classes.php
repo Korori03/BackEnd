@@ -95,7 +95,7 @@ class Api
 	{
 		header_remove();
 		http_response_code($code);
-		self::$_items["status"] = cast::_string($status);
+		self::$_items["status"] = $status?'true':'false';
 		self::$_items["object"] = $object;
 		self::$_items["session"] = self::$_SessionApi;
 		header('Content-Type: application/json');
@@ -425,9 +425,9 @@ class Api
 				break;
 		}
 
-		if ($error_status)
-			return self::jsonFormat(false, $error_status);
+		if($error_status)
+			return json::decode($error_status,false);
 		else
-			return self::jsonFormat(true, $result);
+			return json::decode($result,false);
 	}
 }

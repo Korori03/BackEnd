@@ -40,7 +40,7 @@ class Database{
 		try{
 			$this->_pdo = new PDO('mysql:host='.Config::get('mysql/host'). ';dbname='.Config::get('mysql/db'),Config::get('mysql/username'),Config::get('mysql/password'));
 			$this->_pdo->exec("set names utf8");
-			//$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+			$this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 			$this->_pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 		}catch(PDOException $e){
 			echo "Connection error: " . $e->getMessage();

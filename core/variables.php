@@ -24,8 +24,8 @@ if (!defined('PHP_QUOTE'))
 if (!defined('PHP_DIR')) 
     define('PHP_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 
-if (!defined('MODULES_DIR')) 
-    define('MODULES_DIR', PHP_DIR . '/core/modules/' . DIRECTORY_SEPARATOR);
+if (!defined('MODULES_DIR'))
+    define('MODULES_DIR',  '/core/modules/');
 
 
 ?>

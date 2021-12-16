@@ -87,10 +87,12 @@ spl_autoload_register(function($class_name){
 
 	foreach($modules as $module=>$loader)
     {
-		if(file_exists(MODULES_DIR ."{$loader}"))
-			require_once(MODULES_DIR ."{$module}/{$loader}");
-	}
 
+		$required = 'core/modules/'.strtolower($module) . '/' .$loader;
+		if(file_exists($required)){
+			require_once($required);
+		}
+	}
 
 /*
 	* Get Content Mangement Options for Webpage

@@ -1,12 +1,12 @@
 <?php
 /*
 	* Strings Class Set
-	* @Version 4.0.0
+	* @Version 4.0.1
 	* Developed by: Ami (亜美) Denault
 */
 /*
 	* Strings
-	* @Since 4.0.0
+	* @Since 4.0.1
 */
 declare(strict_types=1);
 class str{
@@ -15,7 +15,7 @@ class str{
 	* Phone Href Replacement
 	* @Since 4.0.0
 	* @Param (String phone)
-*/		
+*/
 	public static function _toPhoneHref(string $phone):string {
 		return str_replace(array(".","-"),'',$phone);
 	}
@@ -56,18 +56,20 @@ class str{
 /*
 	* Format Money
 	* @Since 2.1.4
+	* @Version 2.1.5
 	* @Param (String Number,Boolean Fraction,Boolean Symbol)
 */
 	public static function _money(mixed $number,bool $fractional=false,bool $symbol=true):string {
 		if ($fractional) {
 			$number = sprintf('%.2f', $number);
-		} 
+		}
+		$number = cast::_string($number);
 		while (true) { 
 			$replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number);
 			if ($replaced != $number) {
 				$number = $replaced;
 			} else {
-				break; 
+				break;
 			}
 		}
 		return ($symbol?'$':''). $number;
@@ -182,7 +184,7 @@ class str{
 	public static function _strtoupper (mixed $string):string {
 		if (is_array($string)) 
 			return array_map('strtoupper', $string);
-		
+
 		return strtoupper($string);
 	}
 
