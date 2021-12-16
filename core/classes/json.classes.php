@@ -34,7 +34,6 @@ class Json {
 	
         if($result) 
             return $result;
-
     }
 
 /*
@@ -113,4 +112,3 @@ class Json {
 		return json::encode($response);
 	}
 }
-?>

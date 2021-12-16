@@ -2,7 +2,3 @@
 	Order allow,deny
 	Deny from allow
 </files>
-<files "imageverification.classes.php">
-	Allow from allow
-</files>
-ErrorDocument 403 http://houstoncounty.org/

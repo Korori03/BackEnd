@@ -23,8 +23,8 @@ class Calendar{
 	* @Param (String URL,String Query,Int Int,Int Year)
 */				
 	public function __construct(string $url = NULL, string $query = NULL,int $month = NULL,int $year = NULL) {
-		$this->_month = (is_null($month)?date('n'):$month);
-		$this->_year = (is_null($year)?date('Y'):$year);
+		$this->_month = (is_null($month)?date::_custom('n'):$month);
+		$this->_year = (is_null($year)?date::_custom('Y'):$year);
 		$this->_url = $url;
 		$this->_query = $query;
 		$this->show();
@@ -39,15 +39,15 @@ class Calendar{
 		
 		$month = $this->_month;
 		$year = $this->_year;
-		
+
 		$info = grabber::fromURL($this->_url);
-		$ema_array = json::decode($info, true);
+		$api_array = json::decode($info, true);
 		$calendar = array();
 
-		foreach($ema_array as $key => $item)
+		foreach($api_array as $key => $item)
 			$calendar[] = array("name"=>str::_format($item['name']),"date"=> date::_custom($item['timestamp'],"m-d-Y"),"type"=>"holiday");
 		
-		$cal_Row = Database::getInstance()->query($this->_query); 
+		$cal_Row = Database::getInstance()->query($this->_query);
 		foreach($cal_Row->results() as $cal_info)
 			$calendar[] = array("name"=>str::_format($cal_info->name),"date"=> date::_custom($cal_info->cal_date,"m-d-Y"),"type"=>"event");
 
@@ -100,7 +100,7 @@ class Calendar{
 		for($day = 1,$days_in_month=date::_custom($first_of_month,'t');$day<=$days_in_month; $day++,$weekday++){
 			
 			if($weekday == 7){
-				$weekday   = 0; 
+				$weekday   = 0;
 				$calendar .= "</tr><tr>";	
 			}
 			  
@@ -165,10 +165,9 @@ class Calendar{
 */
 	public static function weeks(int $month,int $year): float{
 		$days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-		$week_day = date("N", mktime(0,0,0,$month,1,$year));
+		$week_day = date::_custom($month . '-01-'. $year,"N");
 		$weeks = ceil(($days + $week_day) / 7);
 		return $weeks + 1;
 	}
 
 }
-?>

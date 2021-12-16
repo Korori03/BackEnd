@@ -15,7 +15,7 @@ declare(strict_types=1);
 class URI
 {
 
-/*
+    /*
 	* Get Domain
 	* @since 1.0.0
 	* @param ()
@@ -25,7 +25,7 @@ class URI
         return (self::is_ssl() ? "https://" : "http://") . $_SERVER['HTTP_HOST'];
     }
 
-/*
+    /*
 	* Is SSL
 	* @since 1.0.0
 	* @param ()
@@ -35,7 +35,7 @@ class URI
         return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? true : false;
     }
 
-/*
+    /*
 	* Get FullPath
 	* @since 1.0.0
 	* @param (String FileName)
@@ -45,7 +45,7 @@ class URI
         return self::domain() . $_SERVER['REQUEST_URI'];
     }
 
-/*
+    /*
 	* Get all Components
 	* @since 1.0.0
 	* @param (String FileName)

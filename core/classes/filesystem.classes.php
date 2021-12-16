@@ -22,24 +22,24 @@ class FileSystem
 	* @Since 4.0.2
 	* @Param (String Basefile,Array Extension)
 */
-	public static function _exist(string $base_filename,array $possible_extensions = array()): bool
+	public static function _exist(string $base_filename, array $possible_extensions = array()): bool
 	{
 		$possible_extensions = cast::_array($possible_extensions);
 		if (strlen(pathinfo($base_filename)['extension']) == 0) {
 			foreach ($possible_extensions as $extension) {
 				$file = "$base_filename.$extension";
-				if (file_exists($_SERVER['DOCUMENT_ROOT']. $file))
+				if (file_exists($_SERVER['DOCUMENT_ROOT'] . $file))
 					return true;
 			}
 		} else {
 			$file = $base_filename;
-			if (file_exists($_SERVER['DOCUMENT_ROOT'] .$file))
+			if (file_exists($_SERVER['DOCUMENT_ROOT'] . $file))
 				return true;
 		}
 		return false;
 	}
 
-/*
+	/*
 	* Remove Dir
 	* @Since 4.0.2
 	* @Param (String Directory)
@@ -54,7 +54,7 @@ class FileSystem
 		}
 	}
 
-/*
+	/*
 	* Remove File
 	* @Since 4.0.2
 	* @Param (String File)
@@ -69,7 +69,7 @@ class FileSystem
 		}
 	}
 
-/*
+	/*
 	* List Files in Directory
 	* @Since 4.0.2
 	* @Param (String Directory)
@@ -102,12 +102,12 @@ class FileSystem
 		return string::_strtolower(end($str_array));
 	}
 
-/*
+	/*
 	* Extension Allowed
 	* @Since 2.2.8
 	* @Param (String File, String Extension)
 */
-	public static function allowedExt(string $string,string $ext = 'jpg,jpeg,gif,png'): bool
+	public static function allowedExt(string $string, string $ext = 'jpg,jpeg,gif,png'): bool
 	{
 		$extension =  self::_extension($string);
 
@@ -119,73 +119,77 @@ class FileSystem
 		return false;
 	}
 
-/*
+	/*
 	* Remove File
 	* @since 4.0.0
 	* @param (String FilePath)
-*/	
-public static function _remove(string $path):void{
-	if(file_exists($path)){	
-		$fh = fopen($path, 'w');
-		fclose($fh);
-		unlink($path);
+*/
+	public static function _remove(string $path): void
+	{
+		if (file_exists($path)) {
+			$fh = fopen($path, 'w');
+			fclose($fh);
+			unlink($path);
+		}
 	}
-}
-public static function _copy($file,$newfile):bool{
-	if (copy($file, $newfile))
-		return true;
+	public static function _copy($file, $newfile): bool
+	{
+		if (copy($file, $newfile))
+			return true;
 
-	return false;
-}
+		return false;
+	}
 
-	public static function _rename($old,$new){
-		if(rename($old, $new))
+	public static function _rename($old, $new)
+	{
+		if (rename($old, $new))
 			@unlink($old);
 	}
 
 	public static function extension_loaded($extname)
-    {
-        return extension_loaded($extname);
-    }
+	{
+		return extension_loaded($extname);
+	}
 
 	public static function _writable($filepath): bool
-    {
-		if(is_dir($filepath))
-        	return is_writable($filepath);
+	{
+		if (is_dir($filepath))
+			return is_writable($filepath);
 
 		return false;
-    }
+	}
 
-    public static function curl_init($url)
-    {
-        return curl_init($url);
-    }
+	public static function curl_init($url)
+	{
+		return curl_init($url);
+	}
 
-    public static function curl_setopt($handle, $option, $value)
-    {
-        return curl_setopt($handle, $option, $value);
-    }
+	public static function curl_setopt($handle, $option, $value)
+	{
+		return curl_setopt($handle, $option, $value);
+	}
 
-    public static function curl_exec($handle)
-    {
-        return curl_exec($handle);
-    }
+	public static function curl_exec($handle)
+	{
+		return curl_exec($handle);
+	}
 
-    public static function curl_getinfo($handle, $option = null)
-    {
-        return curl_getinfo($handle, $option);
-    }
-	
-/*
+	public static function curl_getinfo($handle, $option = null)
+	{
+		return curl_getinfo($handle, $option);
+	}
+
+	/*
 	* Create Folder Path
 	* @Since 4.0.2
 	* @Param (String path)
 */
-public static function createFolderPath($path):bool {
-	$path = dirname($path);
-	if (is_dir($path)) return true;
-	$prev_path = substr($path, 0, strrpos($path, '/', -2) + 1 );
-	$return = self::createFolderPath($prev_path);
-	return ($return && is_writable($prev_path)) ? mkdir($path) : false;
-}
+	public static function createFolderPath($path): bool
+	{
+		$path = dirname($path);
+		if (is_dir($path)) return true;
+		$prev_path = substr($path, 0, strrpos($path, '/', -2) + 1);
+		$return = self::createFolderPath($prev_path);
+		return ($return && is_writable($prev_path)) ? mkdir($path) : false;
+	}
 }

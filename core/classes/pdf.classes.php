@@ -70,9 +70,6 @@ class pdf
 
         $mail->Body($options['message']);
 
-
-
-
         $mail->send();
     }
 }
