@@ -19,12 +19,12 @@ class filter
 	* @Since 4.0.2
 	* @Param (String Variable)
 */
-    public static function bool(string $variable): bool
+    public static function bool(mixed $variable): bool
     {
         $yesList = ['ok', 'y', 'yes', 'true', 't', 'on', '1', '+'];
         $noList = ['no', 'false', 'f', 'off', '0', 'null', 'undefined','-','n'];
 
-        $variable = str::_strtolower($variable);
+        $variable = str::_strtolower(cast::_string($variable));
 
         if (arr::in($variable, $yesList) || cast::_float($variable) !== 0.0)
             return true;
