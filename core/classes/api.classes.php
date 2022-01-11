@@ -91,7 +91,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Boolean,Object,Integer)
 */
-	public static function jsonFormat(bool $status, mixed $object, int $code = 203): mixed
+	public static function jsonFormat(bool $status, mixed $object, int $code = 203)
 	{
 		self::$_items["status"] = $status?'true':'false';
 		self::$_items["object"] = $object;
@@ -107,7 +107,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Integer)
 */
-	public static function NotFound(string $string): void
+	public static function NotFound(string $string)
 	{
 		self::jsonFormat(false, $string, 400);
 	}
@@ -370,7 +370,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (String,String,Array,Array)
 */
-	public static function CallAPI(string $method, string $url, array $data = [], array $headers = []): mixed
+	public static function CallAPI(string $method, string $url, array $data = [], array $headers = [])
 	{
 		$_header 	=	['Content-Type: application/json'];
 		$curl 		=	curl_init();
