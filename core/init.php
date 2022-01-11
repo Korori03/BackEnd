@@ -123,7 +123,7 @@ if(Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Confi
 	* @ Version 1.0.5
 	* @ Since 4.0.0
 */
-$timezone = Options::get('timezone')?Options::get('timezone'):'America/Tegucigalpa';
+$timezone = Options::get('timezone') ? Options::get('timezone') : 'America/Tegucigalpa';
 
 if(function_exists('date_default_timezone_set'))
 	date_default_timezone_set($timezone);
