@@ -194,3 +194,4 @@ class validate{
 		return $this->_passed;
 	}
 }
+?>

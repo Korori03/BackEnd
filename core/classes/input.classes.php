@@ -41,3 +41,4 @@ class Input{
 		return '';
 	}
 }
+?>

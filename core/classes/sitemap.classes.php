@@ -20,7 +20,7 @@ class Sitemap
 
     private
         $classVersion           =   "4.3.3",
-        $robotsFileName            =   "robots.txt",
+        $robotsFileName		    =   "robots.txt",
         $sitemapFileName        =   "sitemap.xml",
         $sitemapXMLFileName   =   "sitemap-index.xml",
         $sitemapXMLFileNameFormat = '',
@@ -78,15 +78,15 @@ class Sitemap
     private $baseURL;
     private $basePath;
 
-    public function __construct(string $baseURL, string $basePath = "", FileSystem $fs = null, Uploader $uploader = null)
+    public function __construct(string $baseURL, string $basePath = "", FileSystem $fs = null,Uploader $uploader= null)
     {
         $this->urls = [];
-        $this->baseURL = rtrim($baseURL, '/') . DIRECTORY_SEPARATOR;
-        $this->uploader = $uploader === null ? new Uploader() : $uploader;
-        $this->fs = $fs === null ? new FileSystem() : $fs;
+        $this->baseURL = rtrim($baseURL, '/'). DIRECTORY_SEPARATOR;
+        $this->uploader =$uploader === null? new Uploader():$uploader;
+        $this->fs = $fs === null? new FileSystem():$fs;
 
         if (!$this->fs->_writable($basePath))
-            self::addError(sprintf('The provided basePath (%s) should be a writable directory,', $basePath) . ' please check its existence and permissions');
+            self::addError(sprintf('The provided basePath (%s) should be a writable directory,', $basePath) .' please check its existence and permissions');
 
         $this->basePath = $basePath;
 
@@ -94,9 +94,8 @@ class Sitemap
         $this->sitemapXMLFileNameFormat = sprintf($this->xmlformat, time());
     }
 
-    public function builder()
-    {
-        $this->setMaxUrlsPerSitemap(50000);
+    public function builder(){
+       $this->setMaxUrlsPerSitemap(50000);
         $this->setSitemapFileName($this->sitemapFileName);
         $this->setsitemapXMLFileName($this->sitemapXMLFileName);
         $this->scanPages();
@@ -106,11 +105,10 @@ class Sitemap
         $this->submitSitemap();
     }
 
-    private function scanPages()
-    {
+    private function scanPages(){
         $pages = Database::getInstance()->get(Config::get('table/content'));
-        foreach ($pages->results() as $page)
-            $this->addURL(sprintf('%s/%s-%s', Slug::_url(str_replace('&amp;', '', WebObjects::getDeptName($page->did))), $page->page, Slug::_url($page->title)), new DateTime(), 'always', 0.5);
+        foreach($pages->results() as $page)
+            $this->addURL(sprintf('%s/%s-%s',Slug::_url(str_replace('&amp;','', WebObjects::getDeptName($page->did))),$page->page,Slug::_url($page->title)), new DateTime(), 'always', 0.5);
     }
 
     private function createXmlWriter(): XMLWriter
@@ -154,7 +152,7 @@ class Sitemap
     public function setMaxUrlsPerSitemap(int $value): Sitemap
     {
         if ($value < 1 || self::MAX_URLS_PER_SITEMAP < $value)
-            self::addError(sprintf('Value %d is out of range 1-%d', $value, self::MAX_URLS_PER_SITEMAP));
+            self::addError( sprintf('Value %d is out of range 1-%d', $value, self::MAX_URLS_PER_SITEMAP));
 
         $this->maxUrlsPerSitemap = $value;
         return $this;
@@ -180,8 +178,8 @@ class Sitemap
     public function validate(
         string $path,
         string $changeFrequency = null,
-        float $priority = null
-    ) {
+        float $priority = null)
+    {
         if (!(1 <= mb_strlen($path) && mb_strlen($path) <= self::MAX_URL_LEN)) {
             self::addError(
                 sprintf("The urlPath argument length must be between 1 and %d.", self::MAX_URL_LEN)
@@ -195,6 +193,7 @@ class Sitemap
         if ($priority !== null && !in_array($priority, $this->validPriorities)) {
             self::addError("Priority argument should be a float number in the range [0.0..1.0]");
         }
+
     }
 
     public function addURL(
@@ -202,7 +201,8 @@ class Sitemap
         DateTime $lastModified = null,
         string $changeFrequency = null,
         float $priority = null
-    ): Sitemap {
+    ): Sitemap
+    {
         $this->validate($path, $changeFrequency, $priority);
 
         if ($this->totalUrlCount >= self::TOTAL_MAX_URLS)
@@ -227,7 +227,7 @@ class Sitemap
         $this->xmlWriter->startDocument("1.0", "UTF-8");
         $this->xmlWriter->writeComment(sprintf('generator-class="%s"', get_class($this)));
         $this->xmlWriter->writeComment(sprintf('generator-version="%s"', $this->classVersion));
-        $this->xmlWriter->writeComment(sprintf('generated-on="%s"', date('c')));
+        $this->xmlWriter->writeComment(sprintf('generated-on="%s"', date::_custom(null,'c')));
         $this->xmlWriter->startElement('urlset');
         $this->xmlWriter->writeAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
         $this->xmlWriter->writeAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
@@ -258,7 +258,7 @@ class Sitemap
 
     private function flushWriter()
     {
-        $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR . sprintf($this->sitemapXMLFileNameFormat, $this->flushedSitemapCounter);
+        $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR. sprintf($this->sitemapXMLFileNameFormat, $this->flushedSitemapCounter);
         $flushedString = $this->xmlWriter->outputMemory(true);
         $flushedStringLen = mb_strlen($flushedString);
 
@@ -277,7 +277,7 @@ class Sitemap
 
     private function writeSitemapEnd()
     {
-        $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR . sprintf($this->sitemapXMLFileNameFormat, $this->flushedSitemapCounter);
+        $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR.sprintf($this->sitemapXMLFileNameFormat, $this->flushedSitemapCounter);
         $this->xmlWriter->endElement();
         $this->xmlWriter->endDocument();
         $this->uploader->_writecontents($targetSitemapFilepath, $this->xmlWriter->flush(true));
@@ -293,6 +293,7 @@ class Sitemap
         $this->flushWriter();
         if ($this->isSitemapStarted)
             $this->writeSitemapEnd();
+
     }
 
 
@@ -306,7 +307,7 @@ class Sitemap
                 $targetSitemapFilename .= '.gz';
 
 
-            $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR . $targetSitemapFilename;
+            $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR.$targetSitemapFilename;
 
             if ($this->isCompressionEnabled) {
                 $this->fs->_copy($this->flushedSitemaps[0], 'compress.zlib://' . $targetSitemapFilepath);
@@ -326,7 +327,7 @@ class Sitemap
             $targetSitemapFilepaths = [];
             foreach ($this->flushedSitemaps as $i => $flushedSitemap) {
                 $targetSitemapFilename = str_replace($ext, ($i + 1) . $targetExt, $this->sitemapFileName);
-                $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR . $targetSitemapFilename;
+                $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR.$targetSitemapFilename;
 
                 if ($this->isCompressionEnabled) {
                     $this->fs->_copy($flushedSitemap, 'compress.zlib://' . $targetSitemapFilepath);
@@ -338,7 +339,7 @@ class Sitemap
                 $targetSitemapFilepaths[] = $targetSitemapFilepath;
             }
 
-            $targetSitemapIndexFilepath = $this->basePath . DIRECTORY_SEPARATOR . $this->sitemapXMLFileName;
+            $targetSitemapIndexFilepath = $this->basePath .DIRECTORY_SEPARATOR. $this->sitemapXMLFileName;
             $this->createSitemapIndex($sitemapsUrls, $targetSitemapIndexFilepath);
             $this->generatedFiles['sitemaps_location'] = $targetSitemapFilepaths;
             $this->generatedFiles['sitemaps_index_location'] = $targetSitemapIndexFilepath;
@@ -367,7 +368,7 @@ class Sitemap
         $this->xmlWriter->startDocument("1.0", "UTF-8");
         $this->xmlWriter->writeComment(sprintf('generator-class="%s"', get_class($this)));
         $this->xmlWriter->writeComment(sprintf('generator-version="%s"', $this->classVersion));
-        $this->xmlWriter->writeComment(sprintf('generated-on="%s"', date('c')));
+        $this->xmlWriter->writeComment(sprintf('generated-on="%s"',date::_custom(null,'c')));
         $this->xmlWriter->startElement('sitemapindex');
         $this->xmlWriter->writeAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
         $this->xmlWriter->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
@@ -378,7 +379,7 @@ class Sitemap
     {
         $this->xmlWriter->startElement('sitemap');
         $this->xmlWriter->writeElement('loc', htmlspecialchars($url, ENT_QUOTES));
-        $this->xmlWriter->writeElement('lastmod', date('c'));
+        $this->xmlWriter->writeElement('lastmod',date::_custom(null,'c'));
         $this->xmlWriter->endElement(); // sitemap
     }
 
@@ -426,10 +427,10 @@ class Sitemap
         if (count($this->generatedFiles) === 0)
             self::addError("To update robots.txt, call finalize() first.");
 
-        $robotsFilePath = $this->basePath . DIRECTORY_SEPARATOR . $this->robotsFileName;
+        $robotsFilePath = $this->basePath . DIRECTORY_SEPARATOR.$this->robotsFileName;
 
         $robotsFileContent = $this->createNewRobotsContentFromFile($robotsFilePath);
-        $this->uploader->_writecontents($robotsFilePath, $robotsFileContent, 'w');
+        $this->uploader->_writecontents($robotsFilePath, $robotsFileContent,'w');
 
         return $this;
     }
@@ -466,17 +467,15 @@ class Sitemap
 		* @since 4.0.0
 		* @param (String Error)
 	*/
-    private static function addError(string $error)
-    {
-        self::$_errors[] = $error;
-    }
-    /*
+	private static function addError(string $error){
+		self::$_errors[] = $error;
+	}
+	/*
 	* Error Call
 	* @since 4.0.0
 	* @param ()
 	*/
-    public static function errors()
-    {
-        return self::$_errors;
-    }
+	public static function errors(){
+		return self::$_errors;
+	}
 }

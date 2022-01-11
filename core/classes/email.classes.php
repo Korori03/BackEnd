@@ -17,10 +17,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-class Email
-{
-
-	/*
+class Email {
+	
+/*
 	* Variables
 	* @Since 4.1.0
 */
@@ -41,13 +40,12 @@ class Email
 		$attachment     = 	array(),
 		$_mailer		=	'';
 
-	/*
+/*
 	* Construct Function
 	* @Since 4.0.0
 	* @Param (String)
 */
-	public function __construct()
-	{
+	public function __construct() {
 		$this->_mailer = new PHPMailer(true);
 		$this->_mailer->isSMTP();
 		$this->_mailer->Host =	$this->_Host;
@@ -65,13 +63,12 @@ class Email
 		$this->_ErrorInfo = $this->_Subject = $this->_Message = $this->_Send_to = '';
 	}
 
-	/*
+/*
 	* Send Function
 	* @Since 4.0.0
 	* @Param (None)
 */
-	public function send()
-	{
+	public function send(){
 		try {
 			//Loop through Attachments
 			for ($x = 0; $x < count($this->attachment); $x++) {
@@ -82,14 +79,14 @@ class Email
 			}
 
 			//Loop through Senders
-			if (count($this->_to) > 0) {
-				for ($x = 0; $x < count($this->_to); $x++) {
-					$this->_mailer->addAddress($this->_to[$x], $this->_to_name[$x]);
+			if(count($this->_to) > 0){
+				for($x=0;$x < count($this->_to);$x++){
+						$this->_mailer->addAddress($this->_to[$x], $this->_to_name[$x]);
 				}
 			}
 
 			//Attempt to Email
-			if (!(bool)$this->_ErrorBool) {
+			if(!(bool)$this->_ErrorBool){
 
 				$this->_ErrorBool = false;
 
@@ -106,85 +103,81 @@ class Email
 		}
 	}
 
-	/*
+/*
 	* Add Attachment
 	* @Since 4.0.0
 	* @Param (String, String, String)
-*/
-	public function AddAttachment(string $path, string $name = '', string $type = 'application/octet-stream'): bool
-	{
+*/		
+	public function AddAttachment(string $path,string $name = '',string $type = 'application/octet-stream'):bool {
 		try {
-			if (!is_file($path) && !filesystem::_exist($this->attachment[0])) {
-				$this->_ErrorInfo .= 'Unable to Find: ' . $path;
+		  if (!is_file($path) && !filesystem::_exist($this->attachment[0])) {
+				$this->_ErrorInfo .= 'Unable to Find: ' .$path;
 				$this->_ErrorBool = true;
 				return true;
-			}
-			$filename = basename($path);
-			if ($name == '')
-				$name = $filename;
-
-			$this->attachment[] = array(
-				0 => $path,
-				1 => $name,
-				2 => $type
-			);
-		} catch (Exception $e) {
+		  }
+		  $filename = basename($path);
+		  if ( $name == '' )
+			$name = $filename;
+		  
+		  $this->attachment[] = array(
+			0 => $path,
+			1 => $name,
+			2 => $type
+		  );
+		}
+		catch (Exception $e) {
 			$this->_ErrorInfo .= $e->getMessage();
 			$this->_ErrorBool = true;
 			return false;
 		}
 		return true;
 	}
-
-	/*
+	
+/*
 	* Add Address to
 	* @Since 4.0.0
 	* @Param (String, String)
-*/
-	public function addAddress(string $to, string $name = ''): void
-	{
-		array_push($this->_to, $to);
+*/	
+	public function addAddress(string $to,string $name=''):void{
+		array_push($this->_to,$to);
 
-		if ($name == '')
-			$name = explode('@', $to)[0];
+		if($name == '')
+			$name = explode('@',$to)[0];
 
-		array_push($this->_to_name, ucwords($name));
+		array_push($this->_to_name,ucwords($name));
 	}
 
-	/*
+/*
 	* Add Address to Array
 	* @Since 4.0.0
 	* @Param (Array To)
-*/
-	public function addAddressArray(array $to): void
-	{
+*/	
+	public function addAddressArray(array $to):void{
+		
+		foreach($to as $key =>$name){
+			array_push($this->_to,$key);
+			if($name=='')
+				$name = explode('@',$key);
 
-		foreach ($to as $key => $name) {
-			array_push($this->_to, $key);
-			if ($name == '')
-				$name = explode('@', $key);
-
-			array_push($this->to_name, ucwords($name));
+			array_push($this->to_name,ucwords($name));
 		}
 	}
-
-	/*
+	
+/*
 	* Add Body
 	* @Since 4.0.0
 	* @Param (String)
-*/
-	public function Body(string $Message): void
-	{
+*/		
+	public function Body(string $Message):void{
 		$this->_Message = $Message;
 	}
 
-	/*
+/*
 	* Change Content Type
 	* @Since 4.0.0
 	* @Param (String)
 */
-	public function Content_Type(string $type): void
-	{
+	public function Content_Type(string $type):void{
 		switch ($type) {
 			case 'plain':
 				$this->_Content_Type = 'plain';
@@ -195,33 +188,30 @@ class Email
 		}
 	}
 
-	/*
+/*
 	* Set Subject Line
 	* @Since 4.0.0
 	* @Param (String)
-*/
-	public function Subject(string $Subject): void
-	{
+*/	
+	public function Subject(string $Subject):void{
 		$this->_Subject = $Subject;
 	}
-	/*
+/*
 	* Get Error Line
 	* @Since 4.0.0
 	* @Param (String)
-*/
-	public function Error(): string
-	{
+*/	
+	public function Error():string{
 		return $this->_ErrorInfo;
 	}
-	/*
+/*
 	* Set From Address
 	* @Since 4.0.0
 	* @Param (String)
-*/
-	public function setFrom(string $sender, string $name = ''): void
-	{
-		if ($name == '')
-			$name = ucwords(explode('@', $sender)[0]);
+*/	
+	public function setFrom(string $sender,string $name=''):void{
+		if($name=='')
+			$name = ucwords(explode('@',$sender)[0]);
 
 		$this->_Sender = $name . " <" . $sender . ">";
 	}

@@ -81,7 +81,7 @@ class User
 	* @since 4.0.0
 	* @Param (String Username, String Password, Boolean Remember)
 */
-	public function login(mixed $username = null, string $password = null, bool $remember = false): bool
+	public function login(mixed $username = null,string $password = null,bool $remember = false): bool
 	{
 		if (!$username && !$password && $this->exists())
 			Session::put($this->_sessionName, $this->data()->id);
@@ -121,7 +121,7 @@ class User
 		if (!is_null($this->_permissions)) {
 			if (strlen(cast::_string($this->_permissions)) > 0) {
 				$permission = json_decode($this->_permissions, true);
-
+				
 				if (filter::bool(cast::_string($permission[$key])))
 					return true;
 			}
@@ -177,11 +177,12 @@ class User
 		$this->_isLoggedIn = false;
 		$this->_data = '';
 		$this->_permissions = '';
-		if (SESSION::exists($this->_sessionName))
+		if(SESSION::exists($this->_sessionName))
 			SESSION::delete($this->_sessionName);
 
-		if (Cookie::exists(Config::get('remember/cookie_name')))
+		if(Cookie::exists(Config::get('remember/cookie_name')))
 			@Cookie::delete(Config::get('remember/cookie_name'));
+
 	}
 
 
@@ -190,7 +191,7 @@ class User
 	* @since 4.0.0	
 	* @param (String Password,Int Length)
 */
-	public function password_check(string $password, int $min_length = 4): int
+	public function password_check(string $password,int $min_length = 4): int
 	{
 		$password = preg_replace('/\s+/', ' ', $password);
 		$strength = 0;
@@ -226,7 +227,7 @@ class User
 	* @since 4.0.0	
 	* @param (Int Length,Int Strength)
 */
-	public function password_generate(int $length = 10, int $strength = 5): string
+	public function password_generate(int $length = 10,int $strength = 5): string
 	{
 		static $special = [
 			'~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',

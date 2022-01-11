@@ -293,3 +293,4 @@ class Uploader{
 		fclose($out);
     }
 }
+?>

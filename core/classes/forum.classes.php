@@ -9,7 +9,6 @@
 	* Setup Forum Class
 	* @since 4.1.5
 */
-
 declare(strict_types=1);
 class Forum
 {
@@ -28,14 +27,14 @@ class Forum
         $this->_user = new User();
     }
 
-    /*
+/*
 	* Get Categories
 	* @Since 4.5.1
 	* @Param ()
 */
-    public function getCategories(): string
+    public function getCategories():string
     {
-        $contentReturn = $topics_list  = '';
+        $contentReturn = $topics_list  ='';
         $cat_div = new Template("cat_div.tpl");
         $topic_div_list = new Template("topic_div_list.tpl");
 
@@ -44,7 +43,7 @@ class Forum
         if ($getCategories->count()) {
             foreach ($getCategories->results() as $categories) {
                 if ($this->_user->hasPermission($categories->permission) || ($categories->permission = 'all'  && $this->_user->hasPermission($categories->permission))) {
-                    $sql_topics = sprintf("SELECT topic_id,topic_subject,topic_date,topic_cat FROM topics WHERE topic_cat = '%d'ORDER BY topic_date DESC LIMIT 1;", $categories->cat_id);
+                    $sql_topics = sprintf("SELECT topic_id,topic_subject,topic_date,topic_cat FROM topics WHERE topic_cat = '%d'ORDER BY topic_date DESC LIMIT 1;",$categories->cat_id);
                     $getTopics = $this->_db->query($sql_topics);
                     if ($getTopics->count()) {
                         foreach ($getTopics->results() as $topics) {
@@ -83,24 +82,24 @@ class Forum
         return $contentReturn;
     }
 
-    /*
+/*
 	* Get Topics in Categories
 	* @Since 4.5.1
 	* @Param ()
 */
-    public function getTopicsInCategory(): string
+    public function getTopicsInCategory():string
     {
-        $contentReturn = $topics_list = $returnTitle = '';
+        $contentReturn = $topics_list =$returnTitle= '';
         $cat_top = new Template("cat_top.tpl");
         $topic_div_list = new Template("topic_div_list.tpl");
 
-        $sql_categories = sprintf("SELECT  cat_id, cat_name, cat_description FROM categories WHERE cat_id = '%b';", Input::get('cat_id'));
+        $sql_categories = sprintf("SELECT  cat_id, cat_name, cat_description FROM categories WHERE cat_id = '%b';",Input::get('cat_id'));
         $getCategories = $this->_db->query($sql_categories);
 
         $categories = $getCategories->results()->first();
         if ($this->_user->hasPermission($categories->permission) || ($categories->permission = 'all'  && $this->_user->hasPermission($categories->permission))) {
             if ($getCategories->count()) {
-                $sql_topics = sprintf("SELECT topic_id,  topic_subject, topic_date,  topic_cat FROM  topics WHERE  topic_cat = '%b';", Input::get('topic_id'));
+                $sql_topics = sprintf("SELECT topic_id,  topic_subject, topic_date,  topic_cat FROM  topics WHERE  topic_cat = '%b';",Input::get('topic_id') );
                 $getTopics = $this->_db->query($sql_topics);
                 if ($getTopics->count()) {
                     foreach ($getTopics->results() as $topics) {
@@ -157,29 +156,31 @@ class Forum
             ));
             $contentReturn .= $cat_top->show();
             $returnTitle = 'You do Not have permission to access this Topic';
+
         }
         self::$page_title = $returnTitle;
         return $contentReturn;
+
     }
 
-    /*
+/*
 	* Get Post in Topics
 	* @Since 4.5.1
 	* @Param ()
 */
-    public function getPostsInTopics(): string
+    public function getPostsInTopics():string
     {
         $contentReturn = $posts_list = $returnTitle = '';
         $topic_top = new Template("topic_top.tpl");
         $post_div_list = new Template("post_div_list.tpl");
 
-        $sql_topics = sprintf("SELECT topic_id, topic_subject  FROM  topics WHERE topics.topic_id = '%b';", Input::get('topic_id'));
+        $sql_topics = sprintf("SELECT topic_id, topic_subject  FROM  topics WHERE topics.topic_id = '%b';",Input::get('topic_id'));
         $getTopics = $this->_db->query($sql_topics);
 
         $topics = $getTopics->results()->first();
         if ($this->_user->hasPermission($topics->permission) || ($topics->permission = 'all'  && $this->_user->hasPermission($topics->permission))) {
             if ($getTopics->count()) {
-                $sql_posts = sprintf("SELECT posts.post_topic, posts.post_content, posts.post_date, posts.post_by, users.user_id, users.user_name FROM posts LEFT JOIN users ON posts.post_by = users.user_id WHERE posts.post_topic = '%b';", $topics->topic_id);
+                $sql_posts = sprintf("SELECT posts.post_topic, posts.post_content, posts.post_date, posts.post_by, users.user_id, users.user_name FROM posts LEFT JOIN users ON posts.post_by = users.user_id WHERE posts.post_topic = '%b';",$topics->topic_id);
                 $getPosts = $this->_db->query($sql_posts);
                 if ($getPosts->count()) {
                     foreach ($getPosts->results() as $posts) {

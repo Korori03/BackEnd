@@ -16,7 +16,7 @@ declare(strict_types=1);
 class Variable
 {
 
-    /*
+/*
     * Check if Number is Between
     * @ Since 4.5.1
     * @param (Float Number,Float Min, Float Max)
@@ -27,7 +27,7 @@ class Variable
     }
 
 
-    /*
+/*
 	* Check if Number is Even
 	* @ Since 4.5.1
 	* @param (Int Number)
@@ -37,7 +37,7 @@ class Variable
         return ($number % 2 === 0);
     }
 
-    /*
+/*
 	* Check if Number is Negative
 	* @ Since 4.5.1
 	* @param (Float Number)
@@ -47,7 +47,7 @@ class Variable
         return ($number < 0);
     }
 
-    /*
+/*
 	* Check if Odd
 	* @ Since 4.5.1
 	* @param (Int Number)
@@ -57,7 +57,7 @@ class Variable
         return !self::isEven($number);
     }
 
-    /*
+/*
 	* Check if Number is Positive
 	* @ Since 4.5.1
 	* @param (Float Number)
@@ -68,7 +68,7 @@ class Variable
     }
 
 
-    /*
+/*
 	* Relative Percent
 	* @ Since 4.5.1
 	* @param (Float Number,Float Current)

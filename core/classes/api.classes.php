@@ -47,7 +47,7 @@ class Api
 */
 	public static function checkSession(string $ip, string $session): bool
 	{
-		$sql = sprintf("SELECT id FROM " . Config::get('table/users') . " WHERE ip = %s and session =%s LIMIT 1;", $ip, $session);
+		$sql = sprintf("SELECT id FROM " . Config::get('table/users') . " WHERE ip = '%s' and session ='%s' LIMIT 1;", $ip, $session);
 		$check = Database::getInstance()->query($sql);
 		return ($check->count() > 0 ? true : false);
 	}
@@ -91,19 +91,15 @@ class Api
 	* @since 4.5.1
 	* @ Param (Boolean,Object,Integer)
 */
-	public static function apiJsonFormat(mixed $status, mixed $object, int $code = 203): mixed
+	public static function jsonFormat(bool $status, mixed $object, int $code = 203): mixed
 	{
-		header_remove();
-		http_response_code($code);
-		$response = array(
-			'status' 	=> filter::bool($status)?'true':'false',
-			'object' 	=> $object,
-			'session' 	=> self::$_SessionApi
+		self::$_items["status"] = $status?'true':'false';
+		self::$_items["object"] = $object;
+		self::$_items["session"] = self::$_SessionApi;
+		echo json::encode(
+			self::$_items,
+			JSON_PRETTY_PRINT
 		);
-
-		header('Content-Type: application/json');
-		echo json::encode($response,JSON_PRETTY_PRINT);
-		exit();
 	}
 
 	/*
@@ -113,7 +109,7 @@ class Api
 */
 	public static function NotFound(string $string): void
 	{
-		self::apiJsonFormat(false, $string, 400);
+		self::jsonFormat(false, $string, 400);
 	}
 
 	/*
@@ -193,7 +189,7 @@ class Api
 
 			if ($login) {
 				$products_arr["status"]		= true;
-				$products_arr["object"]		= (object)["message" => "Login Session Created Successfully"];
+				$products_arr["object"]		=	"Login Session Created Successfully";
 				$products_arr["session"]	=  self::_SetSessionID($username, $password);
 
 				$sql = sprintf("Update " . Config::get('table/users') . " SET `ip` = '%s', `session` = '%s' WHERE `username` ='%s';",self::_GetIP(),$products_arr["session"],$username);
@@ -202,13 +198,13 @@ class Api
 				self::$_SessionApi = $products_arr["session"];
 				Session::set('session_api', $products_arr["session"]);
 			} else {
-				$products_arr["status"] 	= "Sorry, logging in failed";
-				$products_arr["object"] 	= false;
+				$products_arr["status"] 	= false;
+				$products_arr["object"] 	= "Sorry, logging in failed";
 				$products_arr["session"]	= '';
 			}
 		} else {
-			$products_arr["status"]	= implode(',', $validation->errors());
-			$products_arr["object"]	= false;
+			$products_arr["status"]	=false;
+			$products_arr["object"]	= implode(',', $validation->errors());
 			$products_arr["session"]	= '';
 		}
 		return $products_arr;
@@ -221,47 +217,53 @@ class Api
 	public static function GetAPI()
 	{
 		$data = json::decode(file_get_contents("php://input"));
-		if (Input::get('login')) {
-			$return = self::UserCheck();
-			if (Input::get('login')) {
-				self::apiJsonFormat($return['status'], $return['object']);
-			}
-		}
 
 		if (isset($data->session)) {
 			$check =  self::checkSession(self::_GetIP(), $data->session);
-			if ($check)
+			if ($check){
 				self::$_SessionApi = $data->session;
-			else {
+
 				$return = self::UserCheck();
-				if (Input::get('login')) {
-					self::apiJsonFormat($return['status'], $return['object']);
+				if ($return['status']) {
+					self::Grabber($data);
 				}
+				else
+					self::jsonFormat($return['status'], $return['object']);
 			}
 		} else if (Session::exists("session_api")) {
+
 			$check =  self::checkSession(self::_GetIP(), Session::get("session_api"));
-			if ($check)
+
+			if ($check){
 				self::$_SessionApi = Session::get("session_api");
-			else {
+
 				$return = self::UserCheck();
-				if (Input::get('login')) {
-					self::apiJsonFormat($return['status'], $return['object']);
+				if ($return['status']) {
+					self::Grabber($data);
 				}
+				else
+					self::jsonFormat($return['status'], $return['object']);
 			}
 		} else {
 			if (empty(self::$_SessionApi)) {
 				if (isset($data->username) && isset($data->password)) {
 					$return = self::UserCheck();
-					if (Input::get('login')) {
-						self::apiJsonFormat($return['status'], $return['object']);
+					if ($return['status']) {
+						self::Grabber($data);
 					}
+					else
+						self::jsonFormat($return['status'], $return['object']);
+
 				} else {
 					$object = new stdClass();
 					$object->message = "Please sign in to create session API ID";
-					self::apiJsonFormat(true, $object, 500);
+					self::jsonFormat(true, $object, 500);
 				}
 			}
 		}
+
+	}
+	public static function Grabber($data){
 
 		//Session validation
 		header("Access-Control-Allow-Origin: *");
@@ -277,8 +279,7 @@ class Api
 			header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 		}
 
-		// get posted data
-		$data = json::decode(file_get_contents("php://input"));
+
 		$table_ref = ucfirst($data->table);
 		$method = $data->method;
 
@@ -288,17 +289,17 @@ class Api
 					$obj = new $table_ref();
 					if (list($dynamicCall, $object) = call_user_func_array(array($obj, $method), array($data))) { //call_user_func(array($table_ref,$method),$data)){
 						if ($dynamicCall)
-							self::apiJsonFormat(true, $object);
+							self::jsonFormat(true, $object);
 						else
-							self::apiJsonFormat(false, $object, 503);
+							self::jsonFormat(false, $object, 503);
 					} else
-						self::apiJsonFormat(false, "Unable to call function for API (" . $table_ref . "::" . $method . ")", 400);
+						self::jsonFormat(false, "Unable to call function for API (" . $table_ref . "::" . $method . ")", 400);
 				} else
-					self::apiJsonFormat(false, "Method " . $method . " is not found.", 400);
+					self::jsonFormat(false, "Method " . $method . " is not found.", 400);
 			} else
-				self::apiJsonFormat(false, "'" . ucfirst($table_ref) . "' Class does not exist", 400);
+				self::jsonFormat(false, "'" . ucfirst($table_ref) . "' Class does not exist", 400);
 		} else
-			self::apiJsonFormat(false, "Unable to create product. Data is incomplete.", 400);
+			self::jsonFormat(false, "Unable to create product. Data is incomplete.", 400);
 	}
 
 	/*
@@ -425,9 +426,11 @@ class Api
 				break;
 		}
 
-		if($error_status)
-			return json::decode($error_status,false);
+
+		if ($error_status)
+
+			return self::jsonFormat(false, $error_status);
 		else
-			return json::decode($result,false);
+			return self::jsonFormat(true, $result);
 	}
 }

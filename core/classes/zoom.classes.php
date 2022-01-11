@@ -9,7 +9,6 @@
 	* Zoom
 	* @Since 4.5.1
 */
-
 declare(strict_types=1);
 
 class Zoom
@@ -32,12 +31,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * Create Headers
     * @ Since 4.5.1
     * @param ()
 */
-    private function headers(): array
+    private function headers():array
     {
         return [
             'Authorization: Bearer ' .
@@ -47,32 +46,32 @@ class Zoom
         ];
     }
 
-    /*
+/*
     * Handle Error Request
     * @ Since 4.5.1
     * @param ()
 */
-    function requestErrors(): string
+    function requestErrors():string
     {
         return $this->errors;
     }
 
-    /*
+/*
     * Handle Response Request
     * @ Since 4.5.1
     * @param ()
 */
-    function responseCode(): int
+    function responseCode():int
     {
         return $this->responseCode;
     }
 
-    /*
+/*
     * Create Valid Path
     * @ Since 4.5.1
     * @param (String path,Array Params)
 */
-    private function pathReplace($path, $requestParams): string
+    private function pathReplace($path, $requestParams):string
     {
         $errors = [];
         $path = preg_replace_callback(
@@ -95,12 +94,12 @@ class Zoom
         return $path;
     }
 
-    /*
+/*
     * Create Request
     * @ Since 4.5.1
     * @param (String method,String Path,Array QueryParams,Array PathParams,String body)
 */
-    public function doRequest($method, $path, $queryParams = [], $pathParams = [], $body = ''): mixed
+    public function doRequest($method, $path, $queryParams = [], $pathParams = [], $body = ''):mixed
     {
         if (is_array($body)) {
             if (!count($body)) {
@@ -149,12 +148,12 @@ class Zoom
         return json::decode(cast::_string($result), true);
     }
 
-    /*
+/*
     * Generate JWT Token
     * @ Since 4.5.1
     * @param (String apykey,String apysecret)
 */
-    public static function generateJWT($apiKey, $apiSecret): string
+    public static function generateJWT($apiKey, $apiSecret):string
     {
         $token = ['iss' => $apiKey, 'exp' => time() + 60];
         $header = ['typ' => 'JWT', 'alg' => 'HS256'];
@@ -166,22 +165,22 @@ class Zoom
         return $toSign . '.' . self::urlsafeB64Encode($signature);
     }
 
-    /*
+/*
     * Create URL Safe Base64 Encode
     * @ Since 4.5.1
     * @param (String string)
 */
-    public static function urlsafeB64Encode($string): string
+    public static function urlsafeB64Encode($string):string
     {
         return str_replace('=', '', strtr(base64_encode($string), '+/', '-_'));
     }
 
-    /*
+/*
     * Generate Signature
     * @ Since 4.5.1
     * @param (String apykey,String api_secret,String meetingNumber, String Role)
 */
-    public static function generateSignature($api_key, $api_secret, $meeting_number, $role): string
+    public static function generateSignature($api_key, $api_secret, $meeting_number, $role):string
     {
         $time = time() * 1000 - 30000;
 
@@ -203,12 +202,12 @@ class Zoom
         return str::_rtrim(strtr(base64_encode($_sig), '+/', '-_'), '=');
     }
 
-    /*
+/*
     * Get User ID
     * @ Since 4.5.1
     * @param ()
 */
-    public function getUserId(): string|array
+    public function getUserId():string|array
     {
         $response = $this->doRequest(
             'GET',
@@ -225,12 +224,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * Create Meeting
     * @ Since 4.5.1
     * @param (Array MeetingDetails)
 */
-    public function create($meetingDetails): array|int
+    public function create($meetingDetails):array|int
     {
         $response = $this->doRequest(
             'POST',
@@ -248,12 +247,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * Get Templates
     * @ Since 4.5.1
     * @param ()
 */
-    public function template(): string|array
+    public function template():string|array
     {
         $response = $this->doRequest(
             'GET',
@@ -265,17 +264,17 @@ class Zoom
         if ($this->responseCode() == 200) {
             return $response;;
         } else {
-            // print_r($response);
-            // exit();
+           // print_r($response);
+           // exit();
         }
     }
 
-    /*
+/*
     * Update Meeting
     * @ Since 4.5.1
     * @param (Array MeetingDetails,String MeetingID)
 */
-    public function update(array $meetingDetails, string $meetingId): array|int
+    public function update(array $meetingDetails,string $meetingId):array|int
     {
         $response = $this->doRequest(
             'PATCH',
@@ -294,12 +293,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * Delete Meeting
     * @ Since 4.5.1
     * @param (String MeetingID)
 */
-    public function delete(string $meetingId): array|int
+    public function delete(string $meetingId):array|int
     {
         $response = $this->doRequest(
             'DELETE',
@@ -318,12 +317,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * End Meeting
     * @ Since 4.5.1
     * @param (String MeetingID)
 */
-    public function end(string $meetingId): array|int
+    public function end(string $meetingId):array|int
     {
         $response = $this->doRequest(
             'PUT',
@@ -342,12 +341,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * List All Meeting
     * @ Since 4.5.1
     * @param ()
 */
-    public function list(): array|bool
+    public function list():array|bool
     {
         $response = $this->doRequest(
             'GET',
@@ -365,12 +364,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * Meeting Information
     * @ Since 4.5.1
     * @param (String MeetingID)
 */
-    public function meetingInfo(string $meetingId): array|bool
+    public function meetingInfo(string $meetingId):array|bool
     {
         $response = $this->doRequest(
             'GET',
@@ -390,12 +389,12 @@ class Zoom
         }
     }
 
-    /*
+ /*
     * List registrants
     * @ Since 4.5.1
     * @param (String MeetingID)
 */
-    public function listRegistrants(string $meetingId): array|bool
+    public function listRegistrants(string $meetingId):array|bool
     {
         $response = $this->doRequest(
             'GET',
@@ -414,12 +413,12 @@ class Zoom
         }
     }
 
-    /*
+/*
     * Add Registrant
     * @ Since 4.5.1
     * @param (String MeetingID,String Registrant)
 */
-    public function addRegistrant(string $meetingId, string $registrant): array|bool
+    public function addRegistrant(string $meetingId,string $registrant):array|bool
     {
         $response = $this->doRequest(
             'POST',
