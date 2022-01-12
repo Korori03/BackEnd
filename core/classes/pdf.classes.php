@@ -59,7 +59,7 @@ class pdf
     {
         $mail = new Email();
         $mail->Content_Type('html');
-        $mail->setFrom('noreply@houstoncountyal.gov', 'Emailer');
+        $mail->setFrom(Config::get('emailer/from'), 'Emailer');
 
         foreach(explode(',',$options['email']) as $email){
             $mail->addAddress($email);

@@ -46,7 +46,7 @@ class Csv {
 		
 		if(!$fields){
 			$fields = array_map(function ($field){
-				return str::_strtolower(preg_replace("/[^A-Z0-9]/i", '', $field));
+				return str::_tolower(preg_replace("/[^A-Z0-9]/i", '', $field));
 			}, fgetcsv($csv_handle, 0, $delimiter));
 		}
 		

@@ -91,7 +91,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Boolean,Object,Integer)
 */
-	public static function jsonFormat(bool $status, mixed $object, int $code = 203)
+	public static function jsonFormat(bool $status, mixed $object, int $code = 203): void
 	{
 		self::$_items["status"] = $status?'true':'false';
 		self::$_items["object"] = $object;
@@ -107,7 +107,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Integer)
 */
-	public static function NotFound(string $string)
+	public static function NotFound(string $string):void
 	{
 		self::jsonFormat(false, $string, 400);
 	}
@@ -214,7 +214,7 @@ class Api
 	* Get API Type
 	* @since 4.5.1
 */
-	public static function GetAPI()
+	public static function GetAPI():void
 	{
 		$data = json::decode(file_get_contents("php://input"));
 
@@ -263,7 +263,7 @@ class Api
 		}
 
 	}
-	public static function Grabber($data){
+	public static function Grabber($data):void{
 
 		//Session validation
 		header("Access-Control-Allow-Origin: *");
@@ -350,7 +350,7 @@ class Api
 		$success = (int)$stmt->error() === 0 ? true : false;
 		$results = ($success ? $stmt->results() : $stmt->errorMsg());
 
-		switch (explode(' ', str::_strtoupper($query))[0]) {
+		switch (explode(' ', str::_toupper($query))[0]) {
 			case 'DELETE':
 				$results = ($success ? $object->message = "Successfully deleted record" : $stmt->errorMsg());
 				break;
@@ -370,13 +370,12 @@ class Api
 	* @since 4.5.1
 	* @ Param (String,String,Array,Array)
 */
-	public static function CallAPI(string $method, string $url, array $data = [], array $headers = [])
+	public static function CallAPI(string $method, string $url, array $data = [], array $headers = []):void
 	{
 		$_header 	=	['Content-Type: application/json'];
 		$curl 		=	curl_init();
 
-
-		switch (str::_strtoupper($method)) {
+		switch (str::_toupper($method)) {
 			case 'POST':
 				curl_setopt($curl, CURLOPT_POST, true);
 				curl_setopt($curl, CURLOPT_POSTFIELDS, json::encode($data));
@@ -426,9 +425,7 @@ class Api
 				break;
 		}
 
-
 		if ($error_status)
-
 			return self::jsonFormat(false, $error_status);
 		else
 			return self::jsonFormat(true, $result);

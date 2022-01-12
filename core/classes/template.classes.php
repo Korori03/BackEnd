@@ -33,7 +33,7 @@ class Template {
 */
 	public function __construct(string $tpl) {
 		$file_parts = pathinfo($tpl);
-		if(strtolower($file_parts['extension']) == $this->template_ext)
+		if(str::_tolower($file_parts['extension']) == $this->template_ext)
 			$this->tpl = $this->template_dir . Options::get('template') .'/'. $tpl;
 	}
 
@@ -65,7 +65,7 @@ class Template {
 	* @Param ()
 */
 	public function show():string {
-		if (!file_exists($this->tpl))
+		if (!filesystem::_exist($this->tpl))
 			return "Error loading template file (".$this->tpl.")<br />";
 
 		$message = file_get_contents($this->tpl);
@@ -102,8 +102,8 @@ class Template {
 	public function readtpl(string $tpl_temp):string{
 		$extension = explode('.',$tpl_temp);
 		$extension = end($extension);
-		if(strtolower($extension) == 'tpl'){
-			if (!file_exists($this->template_dir . Options::get('template') . '/'.$tpl_temp)) 
+		if(str::_tolower($extension) == 'tpl'){
+			if (!filesystem::_exist($this->template_dir . Options::get('template') . '/'.$tpl_temp)) 
 				return "Error loading template file <br />";
 			else
 				return file_get_contents($this->template_dir . Options::get('template') . '/'.$tpl_temp);

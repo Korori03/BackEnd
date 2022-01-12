@@ -24,7 +24,7 @@ class filter
         $yesList = ['ok', 'y', 'yes', 'true', 't', 'on', '1', '+'];
         $noList = ['no', 'false', 'f', 'off', '0', 'null', 'undefined', '-', 'n'];
 
-        $variable = str::_strtolower($variable);
+        $variable = str::_tolower($variable);
 
         if (arr::in($variable, $yesList) || cast::_float($variable) !== 0.0)
             return true;

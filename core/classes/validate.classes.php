@@ -39,7 +39,7 @@ class validate{
 
 		foreach($items as $item=> $rules){
 
-			$n = @(str::_strtolower($rules['name'])?$rules['name']:'Unknown');
+			$n = @(str::_tolower($rules['name'])?$rules['name']:'Unknown');
 
 			foreach($rules as $rule => $rule_value){
 
@@ -77,7 +77,7 @@ class validate{
 								$this->addError("{$rule_value} must match {$item}.");
 						break;
 						case 'changed':
-							if(str::_strtolower($value) != str::_strtolower($rule_value)){
+							if(str::_tolower($value) != str::_tolower($rule_value)){
 								$check =$this->_db->get(Config::get('table/users'),array('username', '=',$rule_value));
 
 								if($check->count())
@@ -110,7 +110,7 @@ class validate{
 								$this->addError("{$n} is invalid.");
 						break;
 						case 'checkaganistlower':
-							if(!in_array(str::_strtolower($value),cast::_array(str::_strtolower($rule_value))))
+							if(!in_array(str::_tolower($value),cast::_array(str::_tolower($rule_value))))
 								$this->addError("Please enter a valid option for {$n}.");
 						break;
 					}

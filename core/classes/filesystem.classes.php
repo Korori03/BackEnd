@@ -99,7 +99,7 @@ class FileSystem
 	public static function _extension(string $str): string
 	{
 		$str_array = explode('.', $str);
-		return string::_strtolower(end($str_array));
+		return str::_tolower(end($str_array));
 	}
 
 /*
@@ -125,7 +125,7 @@ class FileSystem
 	* @param (String FilePath)
 */	
 	public static function _remove(string $path):void{
-		if(file_exists($path)){	
+		if(self::_exist($path)){
 			$fh = fopen($path, 'w');
 			fclose($fh);
 			unlink($path);

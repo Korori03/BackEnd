@@ -110,6 +110,15 @@ $GLOBALS['config']=array(
 			'name'=>'XXXXXXXXXXXXXX',
 			'email'=>'XXXXXX@XXXXXXXXXXX.XXXXXXXXX'
 		)
+		'from'=>'XXXXXXXXXXXXXXXXXXXXXXXXX'
+		),
+	'zoom'=>array(
+		'api_key' => '',
+		'secret_key' => '',
+	),
+	'youtube'=>array(
+		'api_key' => '',
+		'channel_id' => '',
 	)
 );
 ?>

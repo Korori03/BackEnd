@@ -169,25 +169,32 @@ class str{
 	* @Param (String string)
 */	
 	public static function _strtolower (mixed $string):string {
+		return self::_tolower($string);
+	}
+	public static function _tolower (mixed $string):string {
 		$string = cast::_string($string);
 		if (is_array($string))
 			return array_map('strtolower', $string);
 
 		return strtolower($string);
-	}
 
+	}
 /*
 	* To Upper
 	* @Since 4.0.2
 	* @Param (String string)
 */
 	public static function _strtoupper (mixed $string):string {
-		if (is_array($string)) 
+		return self::_toupper($string);
+	}
+
+	public static function _toupper (mixed $string):string {
+		if (is_array($string))
 			return array_map('strtoupper', $string);
 
 		return strtoupper($string);
-	}
 
+	}
 /*
 	* Preg Match
 	* @Since 4.0.2

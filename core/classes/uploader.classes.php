@@ -32,7 +32,7 @@ class Uploader{
 */
 	public static function ajax_clear_file(string $file_name){
 		$file_temp_path     = getcwd() . self::$_upload_temp_dir . $file_name;
-		@unlink($file_temp_path);
+		@FileSystem::_remove($file_temp_path);
 	}
 
 /*
@@ -49,7 +49,7 @@ class Uploader{
 		$file_path     		= getcwd() . self::$_upload_dir . $pre_file.'_'.Slug::_url($path_parts['filename']).'.'.$path_parts['extension'];
 		
 		if(rename($file_temp_path, $file_path))
-			@unlink($file_temp_path);
+			@FileSystem::_remove($file_temp_path);
 
 		echo Json::returnJson(true, self::$_upload_dir . $pre_file.'_'.Slug::_url($path_parts['filename']).'.'.$path_parts['extension']);
 	}
@@ -172,7 +172,6 @@ class Uploader{
 	}
 
 
-
 /*
 	* Create Guid
 	* @since 4.0.0
@@ -190,7 +189,7 @@ class Uploader{
 		$data .= $_SERVER['REMOTE_PORT'];
 		$data .= time();
 		
-		$hash = strtoupper(hash('ripemd128', $uid . $guid . md5($data)));
+		$hash = str::_toupper(hash('ripemd128', $uid . $guid . md5($data)));
 		$guid = substr($hash,  0,  8) .
 				substr($hash,  8,  4) .
 				substr($hash, 12,  4) .
@@ -206,7 +205,7 @@ class Uploader{
 	* @param (String Path)
 */	
 	public function typeExt(string $path) {
-		$extension =  strtolower(filesystem::_extension($path));
+		$extension =  str::_tolower(filesystem::_extension($path));
 		$type ='file';
 		if($extension === 'png' || $extension === 'gif' || $extension === 'jpg' || $extension === 'jpeg'){
 			$type = 'image';
@@ -228,7 +227,7 @@ class Uploader{
 			$file_title = $_FILES[$file_id]['name'];
 	
 		$extension =  explode('.',$file_title);
-		$extension = strtolower(end($extension));
+		$extension = str::_tolower(end($extension));
 		
 		$file_name = time().'_'. md5($_FILES[$file_id]['name'])  . '.' . $extension;
 		$all_types = explode(",",strtolower($types));

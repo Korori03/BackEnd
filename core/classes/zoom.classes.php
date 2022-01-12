@@ -71,7 +71,7 @@ class Zoom
     * @ Since 4.5.1
     * @param (String path,Array Params)
 */
-    private function pathReplace($path, $requestParams):string
+    private function pathReplace(string $path, array $requestParams):string
     {
         $errors = [];
         $path = preg_replace_callback(
@@ -99,14 +99,10 @@ class Zoom
     * @ Since 4.5.1
     * @param (String method,String Path,Array QueryParams,Array PathParams,String body)
 */
-    public function doRequest($method, $path, $queryParams = [], $pathParams = [], $body = ''):mixed
+    public function doRequest(string $method,string $path,array $queryParams = [],array  $pathParams = [],string $body = ''):mixed
     {
         if (is_array($body)) {
-            if (!count($body)) {
-                $body = '';
-            } else {
-                $body = json::encode($body);
-            }
+            $body = !count($body)?'':json::encode($body);
         }
 
         $this->errors = [];
@@ -117,7 +113,7 @@ class Zoom
         if (count($this->errors))
             return false;
 
-        $method = str::_strtoupper($method);
+        $method = str::_toupper($method);
         $url = $this->baseUrl . $path;
         if (count($queryParams))
             $url .= '?' . http_build_query($queryParams);
@@ -153,12 +149,12 @@ class Zoom
     * @ Since 4.5.1
     * @param (String apykey,String apysecret)
 */
-    public static function generateJWT($apiKey, $apiSecret):string
+    public static function generateJWT(string $apiKey,string $apiSecret):string
     {
         $token = ['iss' => $apiKey, 'exp' => time() + 60];
         $header = ['typ' => 'JWT', 'alg' => 'HS256'];
 
-        $toSign = self::urlsafeB64Encode(json_encode($header)) .  '.' .  self::urlsafeB64Encode(json_encode($token));
+        $toSign = self::urlsafeB64Encode(json::encode($header)) .  '.' .  self::urlsafeB64Encode(json::encode($token));
 
         $signature = hash_hmac('SHA256', $toSign, $apiSecret, true);
 
@@ -170,7 +166,7 @@ class Zoom
     * @ Since 4.5.1
     * @param (String string)
 */
-    public static function urlsafeB64Encode($string):string
+    public static function urlsafeB64Encode(string $string):string
     {
         return str_replace('=', '', strtr(base64_encode($string), '+/', '-_'));
     }
@@ -180,7 +176,7 @@ class Zoom
     * @ Since 4.5.1
     * @param (String apykey,String api_secret,String meetingNumber, String Role)
 */
-    public static function generateSignature($api_key, $api_secret, $meeting_number, $role):string
+    public static function generateSignature(string $api_key,string $api_secret,string $meeting_number,string $role):string
     {
         $time = time() * 1000 - 30000;
 
@@ -229,7 +225,7 @@ class Zoom
     * @ Since 4.5.1
     * @param (Array MeetingDetails)
 */
-    public function create($meetingDetails):array|int
+    public function create(mixed $meetingDetails):mixed
     {
         $response = $this->doRequest(
             'POST',

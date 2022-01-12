@@ -87,8 +87,8 @@ spl_autoload_register(function($class_name){
 
 	foreach($modules as $module=>$loader)
     {
-		$required = 'core/modules/'.strtolower($module) . '/' .$loader;
-		if(file_exists($required)){
+		$required = substr(MODULES_DIR,1).str::_tolower($module) . '/' .$loader;
+		if(filesystem::_exist($required)){
 			require_once($required);
 		}
 	}

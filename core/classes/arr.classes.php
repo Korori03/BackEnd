@@ -86,7 +86,7 @@ class arr
 			$offset = 0;
 			$found = false;
 			foreach ($temp_array as $tmp_key => $tmp_val) {
-				if (!$found && str::_strtolower($val[$subkey]) > str::_strtolower($tmp_val[$subkey])) {
+				if (!$found && str::_tolower($val[$subkey]) > str::_tolower($tmp_val[$subkey])) {
 					$temp_array = array_merge(
 						(array)array_slice($temp_array, 0, $offset),
 						array($key => $val),
@@ -113,7 +113,6 @@ class arr
 */
 	public static function _replace(array $ary1,array $ary2,string $string): string
 	{
-
 		if (count($ary1) !== count($ary2))
 			return '';
 
@@ -253,7 +252,6 @@ class arr
 					$result[$item[$key]][] = $item;
 			}
 		}
-
 		return $result;
 	}
 

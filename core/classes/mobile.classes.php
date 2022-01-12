@@ -35,7 +35,7 @@ class Mobile
 
 	public function __construct()
 	{
-		self::$mobile_ua = str::_strtolower(substr($_SERVER['HTTP_USER_AGENT'], 0, 4));
+		self::$mobile_ua = str::_tolower(substr($_SERVER['HTTP_USER_AGENT'], 0, 4));
 	}
 
 	public static function check(): bool
@@ -50,7 +50,7 @@ class Mobile
 
 	public function isTablet(): bool
 	{
-		if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', str::_strtolower($_SERVER['HTTP_USER_AGENT']))) {
+		if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', str::_tolower($_SERVER['HTTP_USER_AGENT']))) {
 			return true;
 		}
 
@@ -59,11 +59,11 @@ class Mobile
 
 	public function isMobile(): bool
 	{
-		if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', strtolower($_SERVER['HTTP_USER_AGENT']))) {
+		if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', str::_tolower($_SERVER['HTTP_USER_AGENT']))) {
 			return true;
 		}
 
-		if ((strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/vnd.wap.xhtml+xml') > 0) or ((isset($_SERVER['HTTP_X_WAP_PROFILE']) or isset($_SERVER['HTTP_PROFILE'])))) {
+		if ((strpos(str::_tolower($_SERVER['HTTP_ACCEPT']), 'application/vnd.wap.xhtml+xml') > 0) or ((isset($_SERVER['HTTP_X_WAP_PROFILE']) or isset($_SERVER['HTTP_PROFILE'])))) {
 			return true;
 		}
 		

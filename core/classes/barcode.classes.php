@@ -13,14 +13,13 @@ declare(strict_types=1);
 class barcode
 {
     private $options;
-
-
     private $type = 'png';
     private $code_type = 'code128';
     private $size = 30;
     private $factor = 1;
     private $data = 'test';
-    private $print = false;
+    private $footer = true;
+    private $view = true;
     private $save = false;
     private $path = '/content/uploads/';
     private $bgcolor = 'FFFFFF';
@@ -29,135 +28,150 @@ class barcode
     public function __construct($data)
     {
         $this->data    = $data;
-
     }
 
-    public function _setOptions($options){
+    public function _setOptions(object $options):void
+    {
         $this->options = $options;
-        if ($this->options->type)
+        if (property_exists($this->options, 'type'))
             $this->type = $this->options->type;
 
-        if ($this->options->code_type)
+        if (property_exists($this->options, 'code_type'))
             $this->code_type = $this->options->code_type;
 
-        if ($this->options->fgcolor)
+        if (property_exists($this->options, 'fgcolor'))
             $this->fgcolor = $this->options->fgcolor;
 
-        if ($this->options->bgcolor)
+        if (property_exists($this->options, 'bgcolor'))
             $this->bgcolor = $this->options->bgcolor;
 
-        if ($this->options->print)
-            $this->print = $this->options->print;
+        if (property_exists($this->options, 'footer'))
+            $this->footer = $this->options->footer;
 
-        if ($this->options->size)
+        if (property_exists($this->options, 'size'))
             $this->size = $this->options->size;
 
-        if ($this->options->factor)
+        if (property_exists($this->options, 'factor'))
             $this->factor = $this->options->factor;
 
-        if ($this->options->save)
+        if (property_exists($this->options, 'save'))
             $this->save = $this->options->save;
 
-        if ($this->options->path)
-            $this->path = $this->options->path;
+        if (property_exists($this->options, 'view'))
+            $this->view = $this->options->view;
+
+        if (property_exists($this->options, 'path'))
+            $this->path = $_SERVER["DOCUMENT_ROOT"] . $this->options->path;
+        else
+            $this->path = $_SERVER["DOCUMENT_ROOT"] . $this->path;
     }
 
-    public function render()
+    public function render():string
     {
         $image = $this->encode();
+        ob_start("callback");
+        switch (str::_tolower($this->code_type)) {
+            case "qrcode":
+                $this->qrcode_encode();
+                break;
+            default:
+                switch (strtolower(preg_replace('/[^A-Za-z0-9]/', '', $this->type))) {
+                    case 'gif':
+                        header('Content-Type: image/gif');
+                        if ($this->save)
+                            imagegif($image, $this->path . hash::generateRandomString(25) . '.gif');
+                        if ($this->view)
+                            imagegif($image);
 
-        // switch (strtolower(preg_replace('/[^A-Za-z0-9]/', '', $this->type))) {
+                        imagedestroy($image);
+                        break;
+                    case 'jpg':
+                    case 'jpeg':
+                        header('Content-Type: image/jpeg');
+                        if ($this->save)
+                            imagejpeg($image, $this->path . hash::generateRandomString(25) . '.jpg');
+                        if ($this->view)
+                            imagejpeg($image);
 
-        //     case 'gif':
-        //         header('Content-Type: image/gif');
-        //         if($this->save)
-        //             imagegif($image);
-        //         else
-        //             imagegif($image,$this->path.hash::generateRandomString(25).'.gif');
+                        imagedestroy($image);
+                        break;
+                    case 'png':
+                    default:
+                        header('Content-Type: image/png');
+                        if ($this->save)
+                            imagepng($image, $this->path . hash::generateRandomString(25) . '.png');
+                        if ($this->view)
+                            imagepng($image);
 
-        //         imagedestroy($image);
-        //         break;
-        //     case 'jpg':
-        //     case 'jpeg':
-        //         header('Content-Type: image/jpeg');
+                        imagedestroy($image);
+                        break;
+                }
+                break;
+        }
+        $outputimage = ob_get_contents();
+        ob_end_clean();
 
-        //         if($this->save)
-        //             imagejpeg($image);
-        //         else
-        //             imagejpeg($image,$this->path.hash::generateRandomString(25).'.jpg');
-
-
-        //         imagedestroy($image);
-        //         break;
-        //     case 'png':
-        //     default:
-        //         header('Content-Type: image/png');
-
-        //         if($this->save)
-        //             imagepng($image);
-        //         else
-        //             imagepng($image,$this->path.hash::generateRandomString(25).'.png');
-
-
-        //         imagedestroy($image);
-        //         break;
-        // }
+        return $outputimage;
     }
 
 
-    private function encode()
+    private function encode():GdImage
     {
         $code_string = '';
-        switch (str::_strtolower($this->code_type)) {
+        switch (str::_tolower($this->code_type)) {
             case "code128":
             case "code128b":
                 $code_string =  $this->code_128_encode();
+                break;
             case "code128a":
                 $code_string =  $this->code_128_a_encode();
+                break;
             case "code39":
                 $code_string =  $this->code_39_encode();
+                break;
             case "code25":
                 $code_string =  $this->code_25_encode();
+                break;
             case "codabar":
                 $code_string =  $this->codabar_encode();
-            case "qrcode":
-                $code_string =  $this->qrcode_encode();
+                break;
         }
 
         // Pad the edges of the barcode
         $code_length = 20;
-        $text_height = $this->print ? 30 : 0;
-
+        $text_height = $this->footer ? 18 : 0;
 
         for ($i = 1; $i <= strlen($code_string); $i++) {
-            $code_length = $code_length + (int)(substr($code_string, ($i - 1), 1));
+            $code_length = $code_length + cast::_int(substr($code_string, ($i - 1), 1));
         }
-
 
         $img_width = $code_length * $this->factor;
         $img_height = $this->size;
 
+        $image = imagecreate($img_width, cast::_int($img_height + $text_height));
 
-        $image = imagecreate($img_width, $img_height + $text_height);
-        $black = imagecolorallocate($image, 0, 0, 0);
-        $white = imagecolorallocate($image, 255, 255, 255);
+        $bgcolour = self::hexToRgb($this->bgcolor);
+        $fgcolor = self::hexToRgb($this->fgcolor);
 
-        imagefill($image, 0, 0, $white);
-        if ($this->print) {
-            imagestring($image, 5, 31, $img_height, $this->data, $black);
-        }
+        $backgroundColour = imagecolorallocate($image, $bgcolour['r'],  $bgcolour['g'],  $bgcolour['b']);
+        $textColour = imagecolorallocate($image, $fgcolor['r'],  $fgcolor['g'],  $fgcolor['b']);
+
+        imagefill($image, 0, 0, $backgroundColour);
+
+        if ($this->footer)
+            imagestring($image, 5, 31, $img_height, $this->data, $textColour);
 
         $location = 10;
         for ($position = 1; $position <= strlen($code_string); $position++) {
             $cur_size = $location + (substr($code_string, ($position - 1), 1));
-            imagefilledrectangle($image, $location * $this->factor, 0, $cur_size * $this->factor, $img_height, ($position % 2 == 0 ? $white : $black));
+            imagefilledrectangle($image, $location * $this->factor, 0, $cur_size * $this->factor, $img_height, ($position % 2 == 0 ? $backgroundColour : $textColour));
             $location = $cur_size;
         }
 
         return $image;
     }
 
-    private function code_128_encode()
+    private function code_128_encode(): string
     {
         $data = preg_replace('/[\x80-\xFF]/', '', $this->data);
 
@@ -168,21 +182,23 @@ class barcode
         $code_values = array_flip($code_keys);
         for ($X = 1; $X <= strlen($data); $X++) {
             $activeKey = substr($data, ($X - 1), 1);
+
             $code_string .= $code_array[$activeKey];
             $chksum = ($chksum + ($code_values[$activeKey] * $X));
         }
+
         $code_string .= $code_array[$code_keys[($chksum - (intval($chksum / 103) * 103))]];
 
         $code_string = "211214" . $code_string . "2331112";
         return $code_string;
     }
 
-    private function code_128_a_encode()
+    private function code_128_a_encode():string
     {
         $data = preg_replace('/[\x80-\xFF]/', '', $this->data);
         $code_string = '';
         $chksum = 103;
-        $text = strtoupper($data);
+        $text = str::_toupper($data);
         $code_array = array(" " => "212222", "!" => "222122", "\"" => "222221", "#" => "121223", "$" => "121322", "%" => "131222", "&" => "122213", "'" => "122312", "(" => "132212", ")" => "221213", "*" => "221312", "+" => "231212", "," => "112232", "-" => "122132", "." => "122231", "/" => "113222", "0" => "123122", "1" => "123221", "2" => "223211", "3" => "221132", "4" => "221231", "5" => "213212", "6" => "223112", "7" => "312131", "8" => "311222", "9" => "321122", ":" => "321221", ";" => "312212", "<" => "322112", "=" => "322211", ">" => "212123", "?" => "212321", "@" => "232121", "A" => "111323", "B" => "131123", "C" => "131321", "D" => "112313", "E" => "132113", "F" => "132311", "G" => "211313", "H" => "231113", "I" => "231311", "J" => "112133", "K" => "112331", "L" => "132131", "M" => "113123", "N" => "113321", "O" => "133121", "P" => "313121", "Q" => "211331", "R" => "231131", "S" => "213113", "T" => "213311", "U" => "213131", "V" => "311123", "W" => "311321", "X" => "331121", "Y" => "312113", "Z" => "312311", "[" => "332111", "\\" => "314111", "]" => "221411", "^" => "431111", "_" => "111224", "NUL" => "111422", "SOH" => "121124", "STX" => "121421", "ETX" => "141122", "EOT" => "141221", "ENQ" => "112214", "ACK" => "112412", "BEL" => "122114", "BS" => "122411", "HT" => "142112", "LF" => "142211", "VT" => "241211", "FF" => "221114", "CR" => "413111", "SO" => "241112", "SI" => "134111", "DLE" => "111242", "DC1" => "121142", "DC2" => "121241", "DC3" => "114212", "DC4" => "124112", "NAK" => "124211", "SYN" => "411212", "ETB" => "421112", "CAN" => "421211", "EM" => "212141", "SUB" => "214121", "ESC" => "412121", "FS" => "111143", "GS" => "111341", "RS" => "131141", "US" => "114113", "FNC 3" => "114311", "FNC 2" => "411113", "SHIFT" => "411311", "CODE C" => "113141", "CODE B" => "114131", "FNC 4" => "311141", "FNC 1" => "411131", "Start A" => "211412", "Start B" => "211214", "Start C" => "211232", "Stop" => "2331112");
         $code_keys = array_keys($code_array);
         $code_values = array_flip($code_keys);
@@ -197,7 +213,7 @@ class barcode
         return $code_string;
     }
 
-    private function code_39_encode()
+    private function code_39_encode():string
     {
         $data = preg_replace('/[\x80-\xFF]/', '', $this->data);
         $code_string = '';
@@ -212,7 +228,7 @@ class barcode
         return $code_string;
     }
 
-    private function code_25_encode()
+    private function code_25_encode():string
     {
         $data = preg_replace('/[\x80-\xFF]/', '', $this->data);
         $code_string = '';
@@ -239,7 +255,7 @@ class barcode
         return $code_string;
     }
 
-    private function codabar_encode()
+    private function codabar_encode():string
     {
         $data = preg_replace('/[\x80-\xFF]/', '', $this->data);
         $code_string = '';
@@ -247,7 +263,7 @@ class barcode
         $code_array2 = array("1111221", "1112112", "2211111", "1121121", "2111121", "1211112", "1211211", "1221111", "2112111", "1111122", "1112211", "1122111", "2111212", "2121112", "2121211", "1121212", "1122121", "1212112", "1112122", "1112221");
 
         // Convert to uppercase
-        $upper_text = strtoupper($data);
+        $upper_text = str::_toupper($data);
 
         for ($X = 1; $X <= strlen($upper_text); $X++) {
             for ($Y = 0; $Y < count($code_array1); $Y++) {
@@ -259,7 +275,24 @@ class barcode
         return $code_string;
     }
 
-    private function qrcode_encode()
+    private function qrcode_encode():void
     {
+        if ($this->save)
+            QRcode::png($this->data, $this->path . hash::generateRandomString(25) . '.png');
+
+        if ($this->view)
+            QRcode::png($this->data);
+    }
+
+
+    public static function hexToRgb(string $hex):array
+    {
+        $hex      =  preg_replace('/[^0-9A-Fa-f]/', '', $hex);
+        $length   = strlen($hex);
+        $rgb['r'] = hexdec($length == 6 ? substr($hex, 0, 2) : ($length == 3 ? str_repeat(substr($hex, 0, 1), 2) : 0));
+        $rgb['g'] = hexdec($length == 6 ? substr($hex, 2, 2) : ($length == 3 ? str_repeat(substr($hex, 1, 1), 2) : 0));
+        $rgb['b'] = hexdec($length == 6 ? substr($hex, 4, 2) : ($length == 3 ? str_repeat(substr($hex, 2, 1), 2) : 0));
+
+        return $rgb;
     }
 }

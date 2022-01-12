@@ -22,7 +22,7 @@ class Calendar{
 	* @Since 4.0.0
 	* @Param (String URL,String Query,Int Int,Int Year)
 */				
-	public function __construct(string $url = NULL, string $query = NULL,int $month = NULL,int $year = NULL) {
+	public function __construct(string $url = NULL, string $query = NULL,int $month = NULL,int $year = NULL){
 		$this->_month = (is_null($month)?date::_custom('n'):$month);
 		$this->_year = (is_null($year)?date::_custom('Y'):$year);
 		$this->_url = $url;
