@@ -73,13 +73,13 @@ class Variable
 	* @ Since 4.5.1
 	* @param (Float Number,Float Current)
 */
-    public static function relativePercent(float $normal, float $current): string
+    public static function relativePercent(float $total, float $current): string
     {
-        if (!$normal || $normal === $current)
+        if (!$total || $total === $current)
             return '100';
 
-        $normal = abs($normal);
-        $percent = round($current / $normal * 100);
+        $total = abs($total);
+        $percent = round($current / $total * 100);
 
         return number_format($percent, 0, '.', ' ');
     }
