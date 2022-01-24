@@ -91,7 +91,7 @@ class Api
 	* @since 4.5.1
 	* @ Param (Boolean,Object,Integer)
 */
-	public static function jsonFormat(bool $status, mixed $object, int $code = 203): void
+	public static function jsonFormat(bool $status, mixed $object): void
 	{
 		self::$_items["status"] = $status?'true':'false';
 		self::$_items["object"] = $object;
@@ -109,7 +109,7 @@ class Api
 */
 	public static function NotFound(string $string):void
 	{
-		self::jsonFormat(false, $string, 400);
+		self::jsonFormat(false, $string);
 	}
 
 	/*
@@ -257,7 +257,7 @@ class Api
 				} else {
 					$object = new stdClass();
 					$object->message = "Please sign in to create session API ID";
-					self::jsonFormat(true, $object, 500);
+					self::jsonFormat(true, $object);
 				}
 			}
 		}
@@ -291,15 +291,15 @@ class Api
 						if ($dynamicCall)
 							self::jsonFormat(true, $object);
 						else
-							self::jsonFormat(false, $object, 503);
+							self::jsonFormat(false, $object);
 					} else
-						self::jsonFormat(false, "Unable to call function for API (" . $table_ref . "::" . $method . ")", 400);
+						self::jsonFormat(false, "Unable to call function for API (" . $table_ref . "::" . $method . ")");
 				} else
-					self::jsonFormat(false, "Method " . $method . " is not found.", 400);
+					self::jsonFormat(false, "Method " . $method . " is not found.");
 			} else
-				self::jsonFormat(false, "'" . ucfirst($table_ref) . "' Class does not exist", 400);
+				self::jsonFormat(false, "'" . ucfirst($table_ref) . "' Class does not exist");
 		} else
-			self::jsonFormat(false, "Unable to create product. Data is incomplete.", 400);
+			self::jsonFormat(false, "Unable to create product. Data is incomplete.");
 	}
 
 	/*
