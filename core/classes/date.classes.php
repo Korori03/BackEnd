@@ -13,6 +13,7 @@ class Date
     public const ZOOM_FORMAT = 'm/d/Y h:i A';
     public const HUMAN_FORMAT = 'm-d-Y H:i:s';
 
+
     /*
 	* Date To Custom Format
 	* @Since 1.0.0
@@ -90,10 +91,10 @@ class Date
     public static function _toTimeStamp(string $time = null, bool $currentIsDefault = true): int
     {
         if ($time instanceof DateTime)
-            return (int)$time->format('U');
+            return cast::_int($time->format('U'));
 
         if (null !== $time)
-            $time = is_numeric($time) ? (int)$time : (int)strtotime($time);
+            $time = is_numeric($time) ? cast::_int($time) : cast::_int(strtotime($time));
 
         if (!$time)
             $time = $currentIsDefault ? time() : 0;

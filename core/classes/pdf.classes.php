@@ -23,10 +23,11 @@ class pdf
     public $_setpages = 1;
 
 
-    public function __construct($options = [])
+    public function __construct()
     {
         $this->_pdf = new Dompdf();
     }
+
     public function SetPages($pages):void
     {
         $this->_setpages =$pages;
@@ -55,7 +56,7 @@ class pdf
         }
     }
 
-    public function Email($options)
+    public function Email($options):mixed
     {
         $mail = new Email();
         $mail->Content_Type('html');

@@ -33,11 +33,11 @@ class Input{
 	* @Param (String Item)
 */		
 	public static function get(string $item):string{
-		if(isset($_POST[$item])){
+		if(isset($_POST[$item]))
 			return Sanitize::clean($_POST[$item]);
-		}else if(isset($_GET[$item])){
+		else if(isset($_GET[$item]))
 			return Sanitize::clean($_GET[$item]);
-		}
+
 		return '';
 	}
 }

@@ -287,7 +287,7 @@ class User
 	* @since 4.0.0
 	* @Param ()
 */
-	public function data(): array|object|null
+	public function data(): mixed
 	{
 		return $this->_data;
 	}

@@ -46,7 +46,7 @@ class cast
         return (float)$in;
     }
 
-    /*
+/*
 * Cast String
 * @since 4.1.5
 * @param (String Input)
@@ -64,7 +64,7 @@ class cast
         );
     }
 
-    /*
+/*
 * Cast Array
 * @since 4.1.5
 * @param (Array Input)
@@ -87,15 +87,15 @@ class cast
 * @since 4.5.1
 * @param (String Input)
 */
-    public static function _isNull(mixed $in)
+    public static function _isNull(mixed $in):string
     {
         if (is_array($in)) {
             foreach ($in as &$val)
                 $val = self::_isNull($val);
         } else
-            $in = str_replace(chr(0), '', cast::_string($in));
+            $val = str_replace(chr(0), '', cast::_string($in));
 
-        return $in;
+        return $val;
     }
 
     /*
@@ -103,7 +103,7 @@ class cast
 * @since 4.5.1
 * @param (String Input)
 */
-    public static function _bool(mixed $in)
+    public static function _bool(mixed $in):bool
     {
         return filter::bool(cast::_string($in));
     }

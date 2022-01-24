@@ -47,7 +47,7 @@ class Grabber{
 	* @Param (Url String,String Dom, String Object Class in html)
 */	
 	public static function fromUrlData(string $url,string $DOM,string $class):array{
-		
+
 		$str = self::fromURL($url);
 		$doc = new DOMDocument();
 		$doc->loadHTML($str);    

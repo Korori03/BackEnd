@@ -3,7 +3,7 @@
 /*
 	* Korori-Gaming
 	* Pagination Class Set
-	* @Version 4.0.2
+	* @Version 2.1.2
 	* Developed by: Ami (亜美) Denault
 */
 declare(strict_types=1);
@@ -36,30 +36,29 @@ class Pagination {
 		$this->_itemHtml  	= '';
 	}
        
-	public function generate()
+	public function generate():string
 	{
 		$this->_itemHtml = $this->_getHTMLData();	
 		return $this->_itemHtml;
 	}
 
-	public function setTotal(int $total){
+	public function setTotal(int $total):mixed{
 		$this->total		= $total;
 	}
-	public function setCurrent(int $current){
+	public function setCurrent(int $current):mixed{
 		$this->currentPage		= $current;
 	}
 
-	public function setPerPage(int $itemsPerPage){
+	public function setPerPage(int $itemsPerPage):mixed{
 		$this->itemsPerPage		= $itemsPerPage;
 	}
 
-	public function setLinkText(string $linkText){
+	public function setLinkText(string $linkText):mixed{
 		$this->_link		= $linkText;
 	}
 
-	private function  _getHTMLData()
+	private function  _getHTMLData():string
 	{
-
 		$layout = new Template("_pagination.tpl");
 		$list_item = new Template("_pagination_item.tpl");
 		$list ='';

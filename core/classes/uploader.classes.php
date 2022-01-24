@@ -30,7 +30,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (String FileName)
 */
-	public static function ajax_clear_file(string $file_name){
+	public static function ajax_clear_file(string $file_name):void{
 		$file_temp_path     = getcwd() . self::$_upload_temp_dir . $file_name;
 		@FileSystem::_remove($file_temp_path);
 	}
@@ -40,7 +40,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (String FileName,String NewName)
 */
-	public static function ajax_move_file(string $file_name,string $pre_file){
+	public static function ajax_move_file(string $file_name,string $pre_file):void{
 		
 		$file_temp_path     = getcwd() .self::$_upload_temp_dir . $file_name;
 		
@@ -59,7 +59,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (String File,Object FileData)
 */
-	public static  function ajax_upload_file(string $file,mixed $file_data){
+	public static  function ajax_upload_file(string $file,mixed $file_data):void{
 
 		$file_path     = getcwd() .self::$_upload_temp_dir.$file;
 
@@ -80,7 +80,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (Object Data)
 */
-	private static function decode_chunk(mixed $data ) {
+	private static function decode_chunk(mixed $data ):mixed {
 		$data = explode( ';base64,', $data );
 
 		if (!is_array( $data ) || !isset($data[1]) )
@@ -98,7 +98,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (String File Input Name, Integer Width, String Filename,Integer Quality, Integer Height)
 */
-	public function resizeImage(string $pathToImage,int $imagewidth,string $filename,int $quality = 100,string $heighttype = 'auto' ){
+	public function resizeImage(string $pathToImage,int $imagewidth,string $filename,int $quality = 100,string $heighttype = 'auto' ):void{
 		$ext =  filesystem::_extension($filename);
 		
 		if($ext === 'png')
@@ -141,7 +141,7 @@ class Uploader{
 	* @since 4.0.0	
 	* @param (String File Path to Image, String File Path to Thumb,Integer Width, String Filename)
 */
-	public function createThumbs(string $pathToImage,string  $pathToThumb,int $thumbWidth,string $filename ) {
+	public function createThumbs(string $pathToImage,string  $pathToThumb,int $thumbWidth,string $filename ):void {
 		$ext = filesystem::_extension($filename);
 
 		if($ext === 'png')
@@ -150,7 +150,7 @@ class Uploader{
 			$img = imagecreatefromgif( "{$pathToImage}{$filename}" );
 		else
 			$img = imagecreatefromjpeg( "{$pathToImage}{$filename}" );
-		
+
 		
 		$width = imagesx( $img );
 		$height = imagesy( $img );
@@ -177,7 +177,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (String NameSpace)
 */
-	public function create_guid(mixed $namespace = '') {
+	public function create_guid(mixed $namespace = ''):string {
 		static $guid = '';
 		$uid = uniqid("", true);
 		$data = $namespace;
@@ -204,7 +204,7 @@ class Uploader{
 	* @since 4.0.0
 	* @param (String Path)
 */	
-	public function typeExt(string $path) {
+	public function typeExt(string $path) :string{
 		$extension =  str::_tolower(filesystem::_extension($path));
 		$type ='file';
 		if($extension === 'png' || $extension === 'gif' || $extension === 'jpg' || $extension === 'jpeg'){
@@ -218,7 +218,7 @@ class Uploader{
 		* @since 4.0.0	
 		* @param (String File Input Name, String Folder, String Types, Integer Size, Integer Width, String Optional, Integer Height)
 	*/
-	public static function fileUpload(mixed $file_id,string $folder="/content/uploads/",string $types="",int $sizelimit = 20) {
+	public static function fileUpload(mixed $file_id,string $folder="/content/uploads/",string $types="",int $sizelimit = 20):array {
 
 		$file_name = '';	
 		$query = false;

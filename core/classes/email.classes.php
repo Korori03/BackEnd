@@ -68,7 +68,7 @@ class Email {
 	* @Since 4.0.0
 	* @Param (None)
 */
-	public function send(){
+	public function send():bool{
 		try {
 			//Loop through Attachments
 			for ($x = 0; $x < count($this->attachment); $x++) {
@@ -107,7 +107,7 @@ class Email {
 	* Add Attachment
 	* @Since 4.0.0
 	* @Param (String, String, String)
-*/		
+*/
 	public function AddAttachment(string $path,string $name = '',string $type = 'application/octet-stream'):bool {
 		try {
 		  if (!is_file($path) && !filesystem::_exist($this->attachment[0])) {

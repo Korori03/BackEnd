@@ -65,7 +65,7 @@ class Json {
 	* @Since 4.0.0
 	* @Param (String Table,String JSon)
 */
-	public static function toMySql(string $table,string $json){
+	public static function toMySql(string $table,string $json):bool{
 		
 		$stdAry = self::decode($json,true);
 		$db = Database::getInstance();

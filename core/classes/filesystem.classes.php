@@ -143,11 +143,7 @@ class FileSystem
 			@unlink($old);
 	}
 
-	public static function extension_loaded($extname)
-	{
-		return extension_loaded($extname);
-	}
-
+	
 	public static function _writable($filepath): bool
 	{
 		if (is_dir($filepath))

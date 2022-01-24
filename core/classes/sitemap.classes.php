@@ -71,7 +71,7 @@ class Sitemap
         0.9,
         1.0,
     ];
-
+    private $urls = [];
     private $fs;
     private $uploader;
     private $xmlWriter;
@@ -94,7 +94,11 @@ class Sitemap
         $this->sitemapXMLFileNameFormat = sprintf($this->xmlformat, time());
     }
 
-    public function builder(){
+    public function urls(array $urls){
+        $this->urls = $urls;
+    }
+
+    public function builder():mixed{
        $this->setMaxUrlsPerSitemap(50000);
         $this->setSitemapFileName($this->sitemapFileName);
         $this->setsitemapXMLFileName($this->sitemapXMLFileName);
@@ -105,10 +109,10 @@ class Sitemap
         $this->submitSitemap();
     }
 
-    private function scanPages(){
-        $pages = Database::getInstance()->get(Config::get('table/content'));
-        foreach($pages->results() as $page)
-            $this->addURL(sprintf('%s/%s-%s',Slug::_url(str_replace('&amp;','', WebObjects::getDeptName($page->did))),$page->page,Slug::_url($page->title)), new DateTime(), 'always', 0.5);
+    private function scanPages():void{
+
+        foreach($this->urls as $url)
+            $this->addURL($url, new DateTime(), 'always', 0.5);
     }
 
     private function createXmlWriter(): XMLWriter
@@ -178,7 +182,7 @@ class Sitemap
     public function validate(
         string $path,
         string $changeFrequency = null,
-        float $priority = null)
+        float $priority = null):void
     {
         if (!(1 <= mb_strlen($path) && mb_strlen($path) <= self::MAX_URL_LEN)) {
             self::addError(
@@ -222,7 +226,7 @@ class Sitemap
         return $this;
     }
 
-    private function writeSitemapStart()
+    private function writeSitemapStart():void
     {
         $this->xmlWriter->startDocument("1.0", "UTF-8");
         $this->xmlWriter->writeComment(sprintf('generator-class="%s"', get_class($this)));
@@ -237,7 +241,7 @@ class Sitemap
         $this->isSitemapStarted = true;
     }
 
-    private function writeSitemapUrl($loc, $lastModified, $changeFrequency, $priority)
+    private function writeSitemapUrl($loc, $lastModified, $changeFrequency, $priority):void
     {
         $this->xmlWriter->startElement('url');
         $this->xmlWriter->writeElement('loc', htmlspecialchars($loc, ENT_QUOTES));
@@ -256,7 +260,7 @@ class Sitemap
         $this->totalUrlCount++;
     }
 
-    private function flushWriter()
+    private function flushWriter():void
     {
         $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR. sprintf($this->sitemapXMLFileNameFormat, $this->flushedSitemapCounter);
         $flushedString = $this->xmlWriter->outputMemory(true);
@@ -275,7 +279,7 @@ class Sitemap
         $this->uploader->_writecontents($targetSitemapFilepath, $flushedString);
     }
 
-    private function writeSitemapEnd()
+    private function writeSitemapEnd():void
     {
         $targetSitemapFilepath = $this->basePath . DIRECTORY_SEPARATOR.sprintf($this->sitemapXMLFileNameFormat, $this->flushedSitemapCounter);
         $this->xmlWriter->endElement();
@@ -288,7 +292,7 @@ class Sitemap
     }
 
 
-    public function flush()
+    public function flush():void
     {
         $this->flushWriter();
         if ($this->isSitemapStarted)
@@ -297,7 +301,7 @@ class Sitemap
     }
 
 
-    public function finalize()
+    public function finalize():void
     {
         $this->generatedFiles = [];
 
@@ -349,7 +353,7 @@ class Sitemap
         }
     }
 
-    private function createSitemapIndex($sitemapsUrls, $sitemapXMLFileName)
+    private function createSitemapIndex($sitemapsUrls, $sitemapXMLFileName):void
     {
         $this->xmlWriter->flush(true);
         $this->writeSitemapIndexStart();
@@ -363,7 +367,7 @@ class Sitemap
         );
     }
 
-    private function writeSitemapIndexStart()
+    private function writeSitemapIndexStart():void
     {
         $this->xmlWriter->startDocument("1.0", "UTF-8");
         $this->xmlWriter->writeComment(sprintf('generator-class="%s"', get_class($this)));
@@ -375,7 +379,7 @@ class Sitemap
         $this->xmlWriter->writeAttribute('xsi:schemaLocation', 'http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd');
     }
 
-    private function writeSitemapIndexUrl($url)
+    private function writeSitemapIndexUrl($url):void
     {
         $this->xmlWriter->startElement('sitemap');
         $this->xmlWriter->writeElement('loc', htmlspecialchars($url, ENT_QUOTES));
@@ -383,7 +387,7 @@ class Sitemap
         $this->xmlWriter->endElement(); // sitemap
     }
 
-    private function writeSitemapIndexEnd()
+    private function writeSitemapIndexEnd():void
     {
         $this->xmlWriter->endElement();
         $this->xmlWriter->endDocument();
@@ -467,7 +471,7 @@ class Sitemap
 		* @since 4.0.0
 		* @param (String Error)
 	*/
-	private static function addError(string $error){
+	private static function addError(string $error):void{
 		self::$_errors[] = $error;
 	}
 	/*
@@ -475,7 +479,7 @@ class Sitemap
 	* @since 4.0.0
 	* @param ()
 	*/
-	public static function errors(){
+	public static function errors():array{
 		return self::$_errors;
 	}
 }

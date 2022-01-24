@@ -294,14 +294,14 @@ class Zoom
     * @ Since 4.5.1
     * @param (String MeetingID)
 */
-    public function delete(string $meetingId):array|int
+    public function delete(string $meetingId):mixed
     {
         $response = $this->doRequest(
             'DELETE',
             '/meetings/{meetingId}',
             [],
             ['meetingId' => $meetingId],
-            []
+            ''
         );
 
         if ($this->responseCode() == 204) {
